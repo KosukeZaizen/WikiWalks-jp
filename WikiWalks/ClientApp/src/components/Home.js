@@ -3,12 +3,12 @@ import { connect } from 'react-redux';
 
 const Home = props => (
     <div>
-        <h1>Welcome to Wiki Walks!</h1>
+        <h1>Welcome to Wiki Ninja!</h1>
         <p>
             Do you know Wikipedia?<br />
             It is the best online dictionary in the world!<br />
-            This website introduces you articles of Wikipedia regarding each theme!
-            </p>
+            This website introduces you articles of Wikipedia for each theme!
+        </p>
         <h2>Categories</h2>
         <ul>
             <li><a href='https://get.asp.net/'>ASP.NET Core</a> and <a href='https://msdn.microsoft.com/en-us/library/67ef8sbd.aspx'>C#</a> for cross-platform server-side code</li>
