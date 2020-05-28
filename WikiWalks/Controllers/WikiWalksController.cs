@@ -60,16 +60,16 @@ SELECT count(*) as cnt, titleId from Pages GROUP BY titleId
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<Page> getPagesForTitle(int titleId)
+        public IEnumerable<Word> getPagesForTitle(int titleId)
         {
             var con = new DBCon();
-            var l = new List<Page>();
+            var l = new List<Word>();
 
             var result = con.ExecuteSelect($"SELECT p.titleId, p.pageName, p.link, p.explanation, t.publishDate, t.title FROM Pages as p inner join Titles as t on p.titleId = t.titleId and p.titleId = @titleId;", new Dictionary<string, object[]> { { "@titleId", new object[2] { SqlDbType.Int, titleId } } });
 
             result.ForEach((e) =>
             {
-                var page = new Page();
+                var page = new Word();
                 page.titleId = (int)e["titleId"];
                 page.title = (string)e["title"];
                 page.publishDate = DateTime.ParseExact(((int)e["publishDate"]).ToString(), "yyyyMMdd", null);

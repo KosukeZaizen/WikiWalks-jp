@@ -2,13 +2,12 @@ using System;
 
 namespace RelatedPages.Models
 {
-    public class Page
+    public class Word
     {
-        public int titleId { get; set; }
-        public string title { get; set; }
-        public DateTime publishDate { get; set; }
-        public string pageName { get; set; }
-        public string link { get; set; }
-        public string explanation { get; set; }
+        public int wordId { get; set; }
+        public string word { get; set; }
+        public string snippet { get; set; }
+        public DateTime lastEdit { get; set; }
+        public IEquatable<Word> relatedWords { get; set; }
     }
 }
