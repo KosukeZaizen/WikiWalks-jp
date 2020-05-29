@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using Microsoft.AspNetCore.Mvc;
 using RelatedPages.Models;
+using System.Linq;
 
 namespace RelatedPages.Controllers
 {
@@ -60,27 +61,42 @@ SELECT count(*) as cnt, titleId from Pages GROUP BY titleId
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<Page> getPagesForTitle(int titleId)
+        public object getRelatedArticles(int wordId)
         {
+            if (wordId <= 0) return new { };
+
             var con = new DBCon();
-            var l = new List<Page>();
+            var pages = new List<Page>();
+            var categories = new List<String>();
 
-            var result = con.ExecuteSelect($"SELECT p.titleId, p.pageName, p.link, p.explanation, t.publishDate, t.title FROM Pages as p inner join Titles as t on p.titleId = t.titleId and p.titleId = @titleId;", new Dictionary<string, object[]> { { "@titleId", new object[2] { SqlDbType.Int, titleId } } });
+            var result1 = con.ExecuteSelect($"select word from word where wordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
+            string word = (string)result1.FirstOrDefault()["word"];
 
-            result.ForEach((e) =>
+            var result2 = con.ExecuteSelect($"select wr.sourceWordId, w.word, w.snippet from WordReference as wr inner join word as w on wr.sourceWordId = w.wordId and targetWordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
+            result2.ForEach((e) =>
             {
                 var page = new Page();
-                page.titleId = (int)e["titleId"];
-                page.title = (string)e["title"];
-                page.publishDate = DateTime.ParseExact(((int)e["publishDate"]).ToString(), "yyyyMMdd", null);
-                page.link = (string)e["link"];
-                page.pageName = (string)e["pageName"];
-                page.explanation = (string)e["explanation"];
+                page.wordId = (int)e["sourceWordId"];
+                page.word = (string)e["word"];
+                page.snippet = (string)e["snippet"];
 
-                l.Add(page);
+                page.categories = new List<string>();
+                var result3 = con.ExecuteSelect($"select category from Category where wordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, page.wordId } } });
+                result3.ForEach((f) =>
+                {
+                    ((List<string>)page.categories).Add((string)f["category"]);
+                });
+
+                pages.Add(page);
             });
 
-            return l;
+            var result4 = con.ExecuteSelect($"select category from Category where wordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
+            result4.ForEach((e) =>
+            {
+                categories.Add((string)e["category"]);
+            });
+
+            return new { wordId, word, pages, categories };
         }
     }
 }

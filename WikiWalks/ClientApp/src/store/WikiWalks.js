@@ -2,7 +2,7 @@ const requestType = 'REQUEST';
 const receiveDatesType = 'RECEIVE_DATES';
 const receiveTitlesType = 'RECEIVE_TITLES';
 const receivePagesType = 'RECEIVE_PAGES';
-const initialState = { dates: [], titles: [], pages: [], isLoading: false };
+const initialState = { dates: [], titles: [], pages: {}, isLoading: false };
 
 export const actionCreators = {
     requestAllDates: () => async (dispatch, getState) => {
@@ -33,11 +33,13 @@ export const actionCreators = {
             //window.location.href = `/not-found?p=${window.location.pathname}`;
         }
     },
-    requestPagesForTheTitle: titleId => async (dispatch, getState) => {
+    requestPagesForTheTitle: wordId => async (dispatch, getState) => {
         try {
-            const url = `api/WikiWalks/getPagesForTitle?titleId=${titleId}`;
+            const url = `api/WikiWalks/getRelatedArticles?wordId=${wordId}`;
             const response = await fetch(url);
             const pages = await response.json();
+
+            console.log(pages);
             //if (!pages || pages.length <= 0) window.location.href = `/not-found?p=${window.location.pathname}`;
 
             dispatch({ type: receivePagesType, pages });

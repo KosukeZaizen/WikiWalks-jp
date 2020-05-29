@@ -13,7 +13,8 @@ class PagesForTheTitles extends Component {
     }
 
     fetchData() {
-        const titleId = this.props.match.params.wordId;
+        //const titleId = this.props.match.params.wordId;
+        const titleId = 11;
         this.props.requestPagesForTheTitle(titleId);
 
         const page = this.props.pages && this.props.pages[0];
@@ -31,12 +32,13 @@ class PagesForTheTitles extends Component {
     }
 
     render() {
-        console.log("render props",this.props);
-        const page = this.props.pages && this.props.pages[0];
-        const title = page && page.title;
-        const publishDate = page && page.publishDate.split("T").shift();
-        const englishDate = publishDate;
-        const description = `This is a list of the pages related to ${title}. If you want to know about ${title}, please check the list below!`;
+        console.log("render props", this.props);
+        const { word, wordId, categories, pages } = this.props.pages;
+        //const page = this.props.pages && this.props.pages[0];
+        //const publishDate = page && page.publishDate.split("T").shift();
+        //const englishDate = publishDate;
+        const category = categories && categories[0];
+        const description = `This is a list of the Wikipedia pages including ${word}. Please check the list below to know about ${word}!`;
         const arrDesc = description.split(". ");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
         return (
@@ -56,9 +58,9 @@ class PagesForTheTitles extends Component {
                     </span>
                     {" > "}
                     <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
-                        <Link to={"/date/" + publishDate} itemProp="item" style={{ marginRight: "5px", marginLeft: "5px" }}>
+                        <Link to={"/category/" + category} itemProp="item" style={{ marginRight: "5px", marginLeft: "5px" }}>
                             <span itemProp="name">
-                                {englishDate}
+                                {category}
                             </span>
                             <meta itemProp="position" content="2" />
                         </Link>
@@ -66,26 +68,29 @@ class PagesForTheTitles extends Component {
                     {" > "}
                     <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
                         <span itemProp="name" style={{ marginRight: "5px", marginLeft: "5px" }}>
-                            {title}
+                            {word}
                         </span>
                         <meta itemProp="position" content="3" />
                     </span>
                 </div>
                 <hr />
-                <h1>{title}</h1>
+                <h1>{word}</h1>
                 <br />
                 {lineChangeDesc}
                 <br />
                 <hr />
-                <h2>Pages related to {title}</h2>
+                <h2>Pages related to {word}</h2>
                 {renderTable(this.props)}
                 <hr />
-                <h2>Other themes searched on {englishDate}</h2>
-                {renderOtherTable(this.props)}
-                <center>
-                    <Link to={`/date/${publishDate}`}><button>Check all themes searched on {englishDate} >></button></Link>
-                </center>
-                <br />
+                {categories && categories.length > 0 && categories.map(c => (<div>
+                    <h2>Other themes searched on {c}</h2>
+                    {renderOtherTable(this.props)}
+                    <center>
+                        <Link to={`/date/${c}`}><button>Check all themes searched on {c} >></button></Link>
+                    </center>
+                    <br />
+                </div>
+                ))}
             </div>
         );
     }
