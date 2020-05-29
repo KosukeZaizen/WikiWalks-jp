@@ -79,10 +79,10 @@ class PagesForTheTitles extends Component {
                 {lineChangeDesc}
                 <br />
                 <hr />
-                <h2>Pages related to {word}</h2>
+                <h2>Pages including {word}</h2>
                 {renderTable(this.props)}
                 <hr />
-                {categories && categories.length > 0 && categories.map(c => (<div>
+                {categories && categories.length > 0 && categories.map((c,i) => (<div key={i}>
                     <h2>Other themes searched on {c}</h2>
                     {renderOtherTable(this.props)}
                     <center>
@@ -97,7 +97,8 @@ class PagesForTheTitles extends Component {
 }
 
 function renderTable(props) {
-    const { pages } = props;
+    const { pages } = props.pages;
+    console.log("pages", pages);
     return (
         <table className='table table-striped'>
             <thead>
@@ -107,10 +108,12 @@ function renderTable(props) {
                 </tr>
             </thead>
             <tbody>
-                {pages.length > 0 ? pages.map((page, i) =>
+                {pages && pages.length > 0 ? pages.map((page, i) =>
                     <tr key={i}>
-                        <td><a href={page.link} target="_blank" rel="noopener noreferrer">{page.pageName}</a></td>
-                        <td>{page.explanation}</td>
+                        <td><a href={"https://en.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">{page.word}</a></td>
+                        <td>{page.snippet.split(props.pages.word).map((s, j) => {
+                            return <span key={j}>{j !== 0 && <b>{props.pages.word}</b>}{s}</span>;
+                        })}</td>
                     </tr>
                 )
                     :
