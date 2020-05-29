@@ -14,7 +14,7 @@ class PagesForTheTitles extends Component {
 
     fetchData() {
         //const titleId = this.props.match.params.wordId;
-        const titleId = 11;
+        const titleId = 13;
         this.props.requestPagesForTheTitle(titleId);
 
         const page = this.props.pages && this.props.pages[0];
@@ -108,14 +108,47 @@ function renderTable(props) {
                 </tr>
             </thead>
             <tbody>
-                {pages && pages.length > 0 ? pages.map((page, i) =>
+                {pages && pages.length > 0 ? pages.map((page, i) => (
                     <tr key={i}>
                         <td><a href={"https://en.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">{page.word}</a></td>
-                        <td>{page.snippet.split(props.pages.word).map((s, j) => {
-                            return <span key={j}>{j !== 0 && <b>{props.pages.word}</b>}{s}</span>;
-                        })}</td>
+                        <td>
+                            {page.snippet.split(" ").map((s, j) => {
+                                const patterns = {
+                                    '&lt;': '<',
+                                    '&gt;': '>',
+                                    '&amp;': '&',
+                                    '&quot;': '"',
+                                    '&#x27;': '\'',
+                                    '&#x60;': '`'
+                                };
+                                Object.keys(patterns).forEach(k => {s = s.split(k).join(patterns[k])});
+                                const symbol = j === 0 ? "" : " ";
+                                const words = props.pages.word.split(" ");
+                                if (words.some(w => w.toLowerCase() === s.toLowerCase())) {
+                                    return <span key={j}>{symbol}<b>{s}</b></span>;
+                                } else if (words.some(w => (w.toLowerCase() + ",") === s.toLowerCase())) {
+                                    return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>,</span>;
+                                } else if (words.some(w => (w.toLowerCase() + ",\"") === s.toLowerCase())) {
+                                    return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>{",\""}</span>;
+                                } else if (words.some(w => (w.toLowerCase() + ".") === s.toLowerCase())) {
+                                    return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>.</span>;
+                                } else if (words.some(w => (w.toLowerCase() + ")") === s.toLowerCase())) {
+                                    return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>{")"}</span>;
+                                } else if (words.some(w => (w.toLowerCase() + "\"") === s.toLowerCase())) {
+                                    return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>{"\""}</span>;
+                                } else if (words.some(w => ("(" + w.toLowerCase()) === s.toLowerCase())) {
+                                    return <span key={j}>{symbol}{"("}<b>{s.substr(1)}</b></span>;
+                                } else if (words.some(w => ("\"" + w.toLowerCase()) === s.toLowerCase())) {
+                                    return <span key={j}>{symbol}{"\""}<b>{s.substr(1)}</b></span>;
+                                } else if (words.some(w => ("\"\"" + w.toLowerCase()) === s.toLowerCase())) {
+                                    return <span key={j}>{symbol}{"\"\""}<b>{s.substr(1)}</b></span>;
+                                } else {
+                                    return <span key={j}>{symbol}{s}</span>;
+                                }
+                            })}
+                        </td>
                     </tr>
-                )
+                ))
                     :
                     <tr><td>Loading...</td><td></td></tr>}
             </tbody>
