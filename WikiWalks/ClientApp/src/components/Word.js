@@ -13,8 +13,8 @@ class PagesForTheTitles extends Component {
     }
 
     fetchData() {
-        //const titleId = this.props.match.params.wordId;
-        const titleId = 13;
+        console.log("fetchData()");
+        const titleId = this.props.match.params.wordId;
         this.props.requestPagesForTheTitle(titleId);
 
         const page = this.props.pages && this.props.pages[0];
@@ -32,13 +32,12 @@ class PagesForTheTitles extends Component {
     }
 
     render() {
-        console.log("render props", this.props);
         const { word, wordId, categories, pages } = this.props.pages;
         //const page = this.props.pages && this.props.pages[0];
         //const publishDate = page && page.publishDate.split("T").shift();
         //const englishDate = publishDate;
         const category = categories && categories[0];
-        const description = `This is a list of the Wikipedia pages including ${word}. Please check the list below to know about ${word}!`;
+        const description = `This is a list of the Wikipedia pages about ${word}. Please check the list below to know about ${word}!`;
         const arrDesc = description.split(". ");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
         return (
@@ -79,17 +78,14 @@ class PagesForTheTitles extends Component {
                 {lineChangeDesc}
                 <br />
                 <hr />
-                <h2>Pages including {word}</h2>
+                <h2>Pages about {word}</h2>
                 {renderTable(this.props)}
                 <hr />
-                {categories && categories.length > 0 && categories.map((c,i) => (<div key={i}>
-                    <h2>Other themes searched on {c}</h2>
-                    {renderOtherTable(this.props)}
-                    <center>
-                        <Link to={`/date/${c}`}><button>Check all themes searched on {c} >></button></Link>
-                    </center>
-                    <br />
-                </div>
+                {categories && categories.length > 0 && categories.map((c, i) => (
+                    <RenderOtherTable
+                        key={i}
+                        c={c}
+                    />
                 ))}
             </div>
         );
@@ -98,7 +94,7 @@ class PagesForTheTitles extends Component {
 
 function renderTable(props) {
     const { pages } = props.pages;
-    console.log("pages", pages);
+    console.log("pages",pages);
     return (
         <table className='table table-striped'>
             <thead>
@@ -110,7 +106,9 @@ function renderTable(props) {
             <tbody>
                 {pages && pages.length > 0 ? pages.map((page, i) => (
                     <tr key={i}>
-                        <td><a href={"https://en.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">{page.word}</a></td>
+                        <td>
+                            {page.referenceCount > 4 ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
+                        </td>
                         <td>
                             {page.snippet.split(" ").map((s, j) => {
                                 const patterns = {
@@ -146,6 +144,10 @@ function renderTable(props) {
                                     return <span key={j}>{symbol}{s}</span>;
                                 }
                             })}
+                            <br />
+                            <a href={"https://en.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">
+                                {"Open Wikipedia >>"}
+                            </a>
                         </td>
                     </tr>
                 ))
@@ -156,39 +158,63 @@ function renderTable(props) {
     );
 }
 
-function renderOtherTable(props) {
-    const titles = props.titles
-        .filter(t => props.pages[0] && (t.titleId !== props.pages[0].titleId))
-        .filter((t, i) => {
-            try {
-                const l = 13;
-                const n = Math.floor(props.titles.length / l);
-                const s = props.pages[0].titleId % n;
-                return (i + s) % n === 0;
-            } catch (ex) {
-                return false;
-            }
-        });
-    return (
-        <table className='table table-striped'>
-            <thead>
-                <tr>
-                    <th>Theme</th>
-                    <th>Found Articles</th>
-                </tr>
-            </thead>
-            <tbody>
-                {titles.length > 0 ? titles.map(title =>
-                    <tr key={title.titleId}>
-                        <td><Link to={"/theme/" + title.titleId}>{title.title}</Link></td>
-                        <td>{title.cnt} articles</td>
+class RenderOtherTable extends Component {
+
+    constructor(props){
+        super(props);
+
+        this.state = {
+            pages: {},
+        }
+    }
+
+    componentDidMount() {
+        const getData = async () => {
+            const url = `api/WikiWalks/getWordsForCategory?category=${this.props.c}`;
+            const response = await fetch(url);
+            const pages = await response.json();
+            this.setState({ pages });
+        }
+        getData();
+    }
+
+    render() {
+        const { pages } = this.state;
+        const { c } = this.props;
+        return (<div>
+            <h2>{c}</h2>
+            <table className='table table-striped'>
+                <thead>
+                    <tr>
+                    <th>Page Title</th>
+                    <th>Snippet</th>
                     </tr>
-                )
-                    :
-                    <tr><td>Loading...</td><td></td></tr>}
-            </tbody>
-        </table>
-    );
+                </thead>
+                <tbody>
+                    {pages.length > 0 ? pages.map(page =>
+                        <tr key={page.wordId}>
+                            <td>
+                                <Link to={"/word/" + page.wordId}>{page.word}</Link>
+                            </td>
+                            <td>
+                                {page.snippet}
+                                <br />
+                                <a href={"https://en.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">
+                                    {"Open Wikipedia >>"}
+                                </a>
+                            </td>
+                        </tr>
+                    )
+                        :
+                        <tr><td>Loading...</td><td></td></tr>}
+                </tbody>
+            </table>
+            <center>
+                <Link to={`/date/${c}`}><button>Check all themes searched on {c} >></button></Link>
+            </center>
+            <br />
+        </div>);
+    }
 }
 
 export default connect(
