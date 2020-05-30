@@ -6,36 +6,32 @@ import { actionCreators } from '../store/WikiWalks';
 //import { getEnglishDate } from '../common/functions';
 //import Head from './Helmet';
 
-class PagesForTheTitles extends Component {
-    componentDidMount() {
-        // This method is called when the component is first added to the document
-        this.fetchData();
-    }
+class Category extends Component {
 
-    fetchData() {
-        const titleId = this.props.match.params.wordId;
-        this.props.requestPagesForTheTitle(titleId);
+    constructor(props) {
+        super(props);
 
-        const page = this.props.pages && this.props.pages[0];
-        const publishDate = page && page.publishDate.split("T").shift();
-
-        publishDate && this.props.requestTitlesForTheDate(publishDate.split("-").join(""));
-    }
-
-    componentDidUpdate(previousProps) {
-        const pagesLoaded = previousProps.pages.length <= 0 && this.props.pages[0] && this.props.pages[0].publishDate;
-        const changedTheme = previousProps.location !== this.props.location;
-        if (pagesLoaded || changedTheme) {
-            this.fetchData();
+        const category = this.props.match.params.category.split("_").join(" ");
+        this.state = {
+            pages: [],
+            category,
         }
     }
 
+    componentDidMount() {
+        const getData = async () => {
+            const url = `api/WikiWalks/getWordsForCategory?category=${this.state.category}`;
+            const response = await fetch(url);
+            const pages = await response.json();
+            this.setState({ pages });
+        }
+        getData();
+    }
+
     render() {
-        const { word, wordId, categories, pages } = this.props.pages;
-        const cat = categories && categories.sort(c => c.cnt)[0];
-        const category = cat && cat.category;
-        const categoryForUrl = category && category.split(" ").join("_");
-        const description = `This is a list of the Wikipedia pages about ${word ? word : "..."}. Please check the list below to know about ${word ? word : "..."}!`;
+        const { wordId } = this.props.pages;
+        const { pages, category } = this.state;
+        const description = `This is a list of the keywords about ${category ? category : "..."}. Please check the words below to know about ${category ? category : "..."}!`;
         const arrDesc = description.split(". ");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
         return (
@@ -44,7 +40,7 @@ class PagesForTheTitles extends Component {
                     title={title}
                     desc={description}
                 />*/}
-                {category && <div className="breadcrumbs" itemScope itemType="https://schema.org/BreadcrumbList" style={{ textAlign: "left" }}>
+                <div className="breadcrumbs" itemScope itemType="https://schema.org/BreadcrumbList" style={{ textAlign: "left" }}>
                     <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
                         <Link to="/" itemProp="item" style={{ marginRight: "5px", marginLeft: "5px" }}>
                             <span itemProp="name">
@@ -55,37 +51,41 @@ class PagesForTheTitles extends Component {
                     </span>
                     {" > "}
                     <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
-                        <Link to={"/category/" + categoryForUrl} itemProp="item" style={{ marginRight: "5px", marginLeft: "5px" }}>
-                            <span itemProp="name">
-                                {category}
-                            </span>
-                            <meta itemProp="position" content="2" />
-                        </Link>
-                    </span>
-                    {" > "}
-                    <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
                         <span itemProp="name" style={{ marginRight: "5px", marginLeft: "5px" }}>
-                            {word}
+                            {category}
                         </span>
-                        <meta itemProp="position" content="3" />
+                        <meta itemProp="position" content="2" />
                     </span>
-                </div>}
+                </div>
                 <hr />
-                <h1>{word}</h1>
+                <h1>{category}</h1>
                 <br />
                 {lineChangeDesc}
                 <br />
                 <hr />
-                <h2>Pages about {word}</h2>
-                {renderTable(this.props)}
-                <hr />
-                {categories && categories.length > 0 && categories.map((c, i) => (
-                    <RenderOtherTable
-                        key={i}
-                        c={c}
-                        wordId={wordId}
-                    />
-                ))}
+                <h2>Keywords about {category}</h2>
+                <table className='table table-striped'>
+                    <thead>
+                        <tr>
+                            <th>Keywords</th>
+                            <th>Found Articles</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {pages.length > 0 ? pages.filter(page => page.referenceCount > 4).map(page =>
+                            <tr key={page.wordId}>
+                                <td>
+                                    <Link to={"/word/" + page.wordId}>{page.word}</Link>
+                                </td>
+                                <td>
+                                    {page.referenceCount} pages
+                                </td>
+                            </tr>
+                        )
+                            :
+                            <tr><td>Loading...</td><td></td></tr>}
+                    </tbody>
+                </table>
             </div>
         );
     }
@@ -168,7 +168,7 @@ class RenderOtherTable extends Component {
 
     componentDidMount() {
         const getData = async () => {
-            const url = `api/WikiWalks/getWordsForCategory?category=${this.props.c.category}`;
+            const url = `api/WikiWalks/getWordsForCategory?category=${this.props.c}`;
             const response = await fetch(url);
             const pages = await response.json();
             this.setState({ pages });
@@ -180,8 +180,7 @@ class RenderOtherTable extends Component {
         const { pages } = this.state;
         const { c, wordId } = this.props;
         return (<div>
-            <hr />
-            <h2>{c.category}</h2>
+            <h2>{c}</h2>
             <table className='table table-striped'>
                 <thead>
                     <tr>
@@ -193,7 +192,7 @@ class RenderOtherTable extends Component {
                     {pages.length > 0 ? pages.map(page =>
                         <tr key={page.wordId}>
                             <td>
-                                {(page.wordId !== wordId && page.referenceCount > 4) ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
+                                {page.wordId !== wordId && page.referenceCount > 4 ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
                             </td>
                             <td>
                                 {page.snippet}
@@ -215,4 +214,4 @@ class RenderOtherTable extends Component {
 export default connect(
     state => state.wikiWalks,
     dispatch => bindActionCreators(actionCreators, dispatch)
-)(PagesForTheTitles);
+)(Category);

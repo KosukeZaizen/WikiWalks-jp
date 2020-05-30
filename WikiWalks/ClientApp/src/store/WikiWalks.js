@@ -39,7 +39,6 @@ export const actionCreators = {
             const response = await fetch(url);
             const pages = await response.json();
 
-            console.log(pages);
             //if (!pages || pages.length <= 0) window.location.href = `/not-found?p=${window.location.pathname}`;
 
             dispatch({ type: receivePagesType, pages });

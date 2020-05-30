@@ -7,7 +7,6 @@ namespace RelatedPages.Models
         public int wordId { get; set; }
         public string word { get; set; }
         public string snippet { get; set; }
-        public IEnumerable<string> categories { get; set; }
         public int referenceCount { get; set; }
     }
 }
