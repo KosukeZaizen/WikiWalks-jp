@@ -38,7 +38,7 @@ class Top extends Component {
                 <br />
                 <p>
                     Do you know Wikipedia? It is the best online dictionary in the world!<br />
-                    This website introduces you articles of Wikipedia for each category!
+                    This website introduces you to articles of Wikipedia for each category!
                 </p>
                 <br />
                 <table className='table table-striped'>

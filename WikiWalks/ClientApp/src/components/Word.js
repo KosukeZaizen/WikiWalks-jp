@@ -34,7 +34,7 @@ class PagesForTheTitles extends Component {
         const cat = categories && categories.sort(c => c.cnt)[0];
         const category = cat && cat.category;
         const categoryForUrl = category && category.split(" ").join("_");
-        const description = `This is a list of the Wikipedia pages about ${word ? word : "..."}. Please check the list below to know about ${word ? word : "..."}!`;
+        const description = `This is a list of the Wikipedia pages about "${word ? word : "..."}". Please check the list below to learn about "${word ? word : "..."}"!`;
         const arrDesc = description.split(". ");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
         return (

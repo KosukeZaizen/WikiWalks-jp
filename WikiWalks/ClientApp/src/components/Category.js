@@ -36,7 +36,7 @@ class Category extends Component {
 
     render() {
         const { pages, category } = this.state;
-        const description = `This is a list of the keywords about ${category ? category : "..."}. Please check the words below to know about ${category ? category : "..."}!`;
+        const description = `This is a list of the keywords about "${category ? category.split("\"").join("") : "..."}". Please check the words below to learn about "${category ? category.split("\"").join("") : "..."}"!`;
         const arrDesc = description.split(". ");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
         return (
@@ -77,7 +77,7 @@ class Category extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {pages.length > 0 ? pages.sort(page => page.referenceCount).filter(page => page.referenceCount > 4).map(page =>
+                        {pages.length > 0 ? pages.sort((p1, p2) => p2.referenceCount - p1.referenceCount).filter(page => page.referenceCount > 4).map(page =>
                             <tr key={page.wordId}>
                                 <td>
                                     <Link to={"/word/" + page.wordId}>{page.word}</Link>

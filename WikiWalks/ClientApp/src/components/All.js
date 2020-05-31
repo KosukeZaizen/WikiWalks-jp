@@ -27,7 +27,7 @@ class Category extends Component {
 
     render() {
         const { pages } = this.state;
-        const description = `This is a list of keywords of Wikipedia! Choose a keyword you are interested in!`;
+        const description = `This is a list of keywords from Wikipedia! Choose a keyword you are interested in!`;
         const arrDesc = description.split("! ");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
         return (
