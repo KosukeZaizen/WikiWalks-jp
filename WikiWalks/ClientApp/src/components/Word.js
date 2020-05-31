@@ -181,13 +181,20 @@ class RenderOtherTable extends Component {
     }
 
     componentDidMount() {
-        const getData = async () => {
-            const url = `api/WikiWalks/getWordsForCategory?category=${this.props.c.category}`;
-            const response = await fetch(url);
-            const pages = await response.json();
-            this.setState({ pages });
+        this.fetchData();
+    }
+
+    componentDidUpdate(previousProps) {
+        if (previousProps.c !== this.props.c) {
+            this.fetchData();
         }
-        getData();
+    }
+
+    fetchData = async () => {
+        const url = `api/WikiWalks/getWordsForCategory?category=${this.props.c.category}`;
+        const response = await fetch(url);
+        const pages = await response.json();
+        this.setState({ pages });
     }
 
     render() {
