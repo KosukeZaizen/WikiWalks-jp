@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { actionCreators } from '../store/WikiWalks';
 import Head from './Helmet';
+import AnchorLink from 'react-anchor-link-smooth-scroll';
 
 class PagesForTheTitles extends Component {
     componentDidMount() {
@@ -30,11 +31,12 @@ class PagesForTheTitles extends Component {
     }
 
     render() {
-        const { word, wordId, categories } = this.props.pages;
+        const { wordId, categories } = this.props.pages;
+        const word = this.props.pages.word || "";
         const cat = categories && categories.sort(c => c.cnt)[0];
         const category = cat && cat.category;
         const categoryForUrl = category && category.split(" ").join("_");
-        const description = `This is a list of the Wikipedia pages about "${word ? word : "..."}". Please check the list below to learn about "${word ? word : "..."}"!`;
+        const description = `This is a list of the Wikipedia pages about "${word}". Please check the list below to learn about "${word}"!`;
         const arrDesc = description.split(". ");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
         return (
@@ -86,10 +88,22 @@ class PagesForTheTitles extends Component {
                 <br />
                 {lineChangeDesc}
                 <br />
+                <div style={{ maxWidth: "500px", padding: "10px", marginBottom: "10px", border: "5px double gray" }}>
+                    <center><p style={{ fontWeight: "bold", fontSize: "large" }}>Index</p></center>
+                    <hr />
+                    {word ? <ul>
+                        <li><AnchorLink href={`#Pages about ${word}`}>{`Pages about ${word}`}</AnchorLink></li>
+                        {categories && categories.length > 0 && categories.map((c, i) => (
+                            <li key={i}><AnchorLink href={"#" + c.category}>{c.category}</AnchorLink></li>
+                        ))}
+                    </ul>
+                        :
+                        <center>Loading...<br /></center>
+                    }
+                </div>
                 <hr />
-                <h2>{`Pages about ${word}`}</h2>
+                <h2 id={`Pages about ${word}`}>{`Pages about ${word}`}</h2>
                 {renderTable(this.props)}
-                <hr />
                 {categories && categories.length > 0 && categories.map((c, i) => (
                     <RenderOtherTable
                         key={i}
@@ -202,7 +216,7 @@ class RenderOtherTable extends Component {
         const { c, wordId } = this.props;
         return (<React.Fragment>
             <hr />
-            <h2>{c.category}</h2>
+            <h2 id={c.category}>{c.category}</h2>
             <table className='table table-striped'>
                 <thead>
                     <tr>
