@@ -193,7 +193,7 @@ class RenderOtherTable extends Component {
     render() {
         const { pages } = this.state;
         const { c, wordId } = this.props;
-        return (<div>
+        return (<React.Fragment>
             <hr />
             <h2>{c.category}</h2>
             <table className='table table-striped'>
@@ -222,7 +222,7 @@ class RenderOtherTable extends Component {
                         <tr><td>Loading...</td><td></td></tr>}
                 </tbody>
             </table>
-        </div>);
+        </React.Fragment>);
     }
 }
 
