@@ -88,19 +88,22 @@ class PagesForTheTitles extends Component {
                 <br />
                 {lineChangeDesc}
                 <br />
-                <div style={{ maxWidth: "500px", padding: "10px", marginBottom: "10px", border: "5px double gray" }}>
-                    <center><p style={{ fontWeight: "bold", fontSize: "large" }}>Index</p></center>
-                    <hr />
-                    {word ? <ul>
-                        <li><AnchorLink href={`#Pages about ${word}`}>{`Pages about ${word}`}</AnchorLink></li>
-                        {categories && categories.length > 0 && categories.map((c, i) => (
-                            <li key={i}><AnchorLink href={"#" + c.category}>{c.category}</AnchorLink></li>
-                        ))}
-                    </ul>
-                        :
-                        <center>Loading...<br /></center>
-                    }
-                </div>
+                {
+                    categories && categories.length > 0 &&
+                    <div style={{ maxWidth: "500px", padding: "10px", marginBottom: "10px", border: "5px double gray" }}>
+                        <center><p style={{ fontWeight: "bold", fontSize: "large" }}>Index</p></center>
+                        <hr />
+                        {word ? <ul>
+                            <li><AnchorLink href={`#Pages about ${word}`}>{`Pages about ${word}`}</AnchorLink></li>
+                            {categories.map((c, i) => (
+                                <li key={i}><AnchorLink href={"#" + c.category}>{c.category}</AnchorLink></li>
+                            ))}
+                        </ul>
+                            :
+                            <center>Loading...<br /></center>
+                        }
+                    </div>
+                }
                 <hr />
                 <h2 id={`Pages about ${word}`}>{`Pages about ${word}`}</h2>
                 {renderTable(this.props)}

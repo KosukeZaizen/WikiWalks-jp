@@ -48,7 +48,7 @@ class Category extends Component {
                     {" > "}
                     <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
                         <span itemProp="name" style={{ marginRight: "5px", marginLeft: "5px" }}>
-                            {"Keywords"}
+                            {"All Keywords"}
                         </span>
                         <meta itemProp="position" content="2" />
                     </span>
