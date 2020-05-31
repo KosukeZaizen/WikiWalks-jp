@@ -26,7 +26,7 @@ from (
 	having count(*) > 4
 ) as rel
 group by category 
-having count(*) > 4;
+order by cnt desc;
 ");
 
             result.ForEach((e) =>
@@ -139,6 +139,38 @@ and c.category like @category;
             });
 
             return new { wordId, word, pages, categories };
+        }
+
+        [HttpGet("[action]")]
+        public IEnumerable<Page> getAllWords()
+        {
+            var con = new DBCon();
+            var pages = new List<Page>();
+
+            string sql = @"
+select w.wordId, w.word, count(*) as cnt from word as w
+inner join WordReference as wr
+on w.wordId = wr.targetWordId
+group by w.wordId, w.word
+having count(*) > 4
+order by cnt desc;
+";
+
+            var result = con.ExecuteSelect(sql);
+
+            result.ForEach((e) =>
+            {
+                var page = new Page();
+                page.wordId = (int)e["wordId"];
+                page.word = (string)e["word"];
+
+                var res = con.ExecuteSelect($"select wr.sourceWordId, w.word, w.snippet from WordReference as wr inner join word as w on wr.sourceWordId = w.wordId and targetWordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, page.wordId } } });
+                page.referenceCount = res.Count();
+
+                pages.Add(page);
+            });
+
+            return pages;
         }
     }
 }

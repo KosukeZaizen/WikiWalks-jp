@@ -10,39 +10,30 @@ class Category extends Component {
     constructor(props) {
         super(props);
 
-        const category = this.props.match.params.category.split("_").join(" ");
         this.state = {
             pages: [],
-            category,
         }
     }
 
     componentDidMount() {
         const getData = async () => {
-            try {
-                const url = `api/WikiWalks/getWordsForCategory?category=${this.state.category}`;
-                const response = await fetch(url);
-                const pages = await response.json();
-
-                if (!pages || pages.length <= 0) window.location.href = `/not-found?p=${window.location.pathname}`;
-
-                this.setState({ pages });
-            } catch (e) {
-                window.location.href = `/not-found?p=${window.location.pathname}`;
-            }
+            const url = `api/WikiWalks/getAllWords`;
+            const response = await fetch(url);
+            const pages = await response.json();
+            this.setState({ pages });
         }
         getData();
     }
 
     render() {
-        const { pages, category } = this.state;
-        const description = `This is a list of the keywords about ${category ? category : "..."}. Please check the words below to know about ${category ? category : "..."}!`;
-        const arrDesc = description.split(". ");
+        const { pages } = this.state;
+        const description = `This is a list of keywords of Wikipedia! Choose a keyword you are interested in!`;
+        const arrDesc = description.split("! ");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
         return (
             <div>
                 <Head
-                    title={category}
+                    title={"All Keywords"}
                     desc={description}
                 />
                 <div className="breadcrumbs" itemScope itemType="https://schema.org/BreadcrumbList" style={{ textAlign: "left" }}>
@@ -57,18 +48,16 @@ class Category extends Component {
                     {" > "}
                     <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
                         <span itemProp="name" style={{ marginRight: "5px", marginLeft: "5px" }}>
-                            {category}
+                            {"Keywords"}
                         </span>
                         <meta itemProp="position" content="2" />
                     </span>
                 </div>
                 <hr />
-                <h1>{category}</h1>
+                <h1>Keywords</h1>
                 <br />
                 {lineChangeDesc}
                 <br />
-                <hr />
-                <h2>Keywords about {category}</h2>
                 <table className='table table-striped'>
                     <thead>
                         <tr>
@@ -77,7 +66,7 @@ class Category extends Component {
                         </tr>
                     </thead>
                     <tbody>
-                        {pages.length > 0 ? pages.sort(page => page.referenceCount).filter(page => page.referenceCount > 4).map(page =>
+                        {pages.length > 0 ? pages.filter(page => page.referenceCount > 4).map(page =>
                             <tr key={page.wordId}>
                                 <td>
                                     <Link to={"/word/" + page.wordId}>{page.word}</Link>

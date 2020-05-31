@@ -3,8 +3,7 @@ import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { actionCreators } from '../store/WikiWalks';
-//import { getEnglishDate } from '../common/functions';
-//import Head from './Helmet';
+import Head from './Helmet';
 
 class PagesForTheTitles extends Component {
     componentDidMount() {
@@ -31,7 +30,7 @@ class PagesForTheTitles extends Component {
     }
 
     render() {
-        const { word, wordId, categories, pages } = this.props.pages;
+        const { word, wordId, categories } = this.props.pages;
         const cat = categories && categories.sort(c => c.cnt)[0];
         const category = cat && cat.category;
         const categoryForUrl = category && category.split(" ").join("_");
@@ -40,11 +39,11 @@ class PagesForTheTitles extends Component {
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
         return (
             <div>
-                {/*<Head
-                    title={title}
+                <Head
+                    title={word}
                     desc={description}
-                />*/}
-                {category && <div className="breadcrumbs" itemScope itemType="https://schema.org/BreadcrumbList" style={{ textAlign: "left" }}>
+                />
+                {<div className="breadcrumbs" itemScope itemType="https://schema.org/BreadcrumbList" style={{ textAlign: "left" }}>
                     <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
                         <Link to="/" itemProp="item" style={{ marginRight: "5px", marginLeft: "5px" }}>
                             <span itemProp="name">
@@ -54,14 +53,26 @@ class PagesForTheTitles extends Component {
                         <meta itemProp="position" content="1" />
                     </span>
                     {" > "}
-                    <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
-                        <Link to={"/category/" + categoryForUrl} itemProp="item" style={{ marginRight: "5px", marginLeft: "5px" }}>
-                            <span itemProp="name">
-                                {category}
+                    {
+                        category ?
+                            <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
+                                <Link to={"/category/" + categoryForUrl} itemProp="item" style={{ marginRight: "5px", marginLeft: "5px" }}>
+                                    <span itemProp="name">
+                                        {category}
+                                    </span>
+                                    <meta itemProp="position" content="2" />
+                                </Link>
                             </span>
-                            <meta itemProp="position" content="2" />
-                        </Link>
-                    </span>
+                            :
+                            <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
+                                <Link to={"/all"} itemProp="item" style={{ marginRight: "5px", marginLeft: "5px" }}>
+                                    <span itemProp="name">
+                                        {"All Keywords"}
+                                    </span>
+                                    <meta itemProp="position" content="2" />
+                                </Link>
+                            </span>
+                    }
                     {" > "}
                     <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
                         <span itemProp="name" style={{ marginRight: "5px", marginLeft: "5px" }}>
@@ -92,7 +103,7 @@ class PagesForTheTitles extends Component {
 }
 
 function renderTable(props) {
-    const { pages, wordId } = props.pages;
+    const { pages, wordId, word } = props.pages;
     return (
         <table className='table table-striped'>
             <thead>
@@ -102,53 +113,56 @@ function renderTable(props) {
                 </tr>
             </thead>
             <tbody>
-                {pages && pages.length > 0 ? pages.map((page, i) => (
-                    <tr key={i}>
-                        <td>
-                            {page.wordId !== wordId && page.referenceCount > 4 ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
-                        </td>
-                        <td>
-                            {page.snippet.split(" ").map((s, j) => {
-                                const patterns = {
-                                    '&lt;': '<',
-                                    '&gt;': '>',
-                                    '&amp;': '&',
-                                    '&quot;': '"',
-                                    '&#x27;': '\'',
-                                    '&#x60;': '`'
-                                };
-                                Object.keys(patterns).forEach(k => { s = s.split(k).join(patterns[k]) });
-                                const symbol = j === 0 ? "" : " ";
-                                const words = props.pages.word.split(" ");
-                                if (words.some(w => w.toLowerCase() === s.toLowerCase())) {
-                                    return <span key={j}>{symbol}<b>{s}</b></span>;
-                                } else if (words.some(w => (w.toLowerCase() + ",") === s.toLowerCase())) {
-                                    return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>,</span>;
-                                } else if (words.some(w => (w.toLowerCase() + ",\"") === s.toLowerCase())) {
-                                    return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>{",\""}</span>;
-                                } else if (words.some(w => (w.toLowerCase() + ".") === s.toLowerCase())) {
-                                    return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>.</span>;
-                                } else if (words.some(w => (w.toLowerCase() + ")") === s.toLowerCase())) {
-                                    return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>{")"}</span>;
-                                } else if (words.some(w => (w.toLowerCase() + "\"") === s.toLowerCase())) {
-                                    return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>{"\""}</span>;
-                                } else if (words.some(w => ("(" + w.toLowerCase()) === s.toLowerCase())) {
-                                    return <span key={j}>{symbol}{"("}<b>{s.substr(1)}</b></span>;
-                                } else if (words.some(w => ("\"" + w.toLowerCase()) === s.toLowerCase())) {
-                                    return <span key={j}>{symbol}{"\""}<b>{s.substr(1)}</b></span>;
-                                } else if (words.some(w => ("\"\"" + w.toLowerCase()) === s.toLowerCase())) {
-                                    return <span key={j}>{symbol}{"\"\""}<b>{s.substr(1)}</b></span>;
-                                } else {
-                                    return <span key={j}>{symbol}{s}</span>;
-                                }
-                            })}
-                            <br />
-                            <a href={"https://en.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">
-                                {"Check the Wikipedia page for " + page.word + " >>"}
-                            </a>
-                        </td>
-                    </tr>
-                ))
+                {pages && pages.length > 0 ?
+                    pages
+                        .sort((page1, page2) => page2.snippet.split(word).length - page1.snippet.split(word).length)
+                        .map((page, i) => (
+                            <tr key={i}>
+                                <td>
+                                    {page.wordId !== wordId && page.referenceCount > 4 ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
+                                </td>
+                                <td>
+                                    {page.snippet.split(" ").map((s, j) => {
+                                        const patterns = {
+                                            '&lt;': '<',
+                                            '&gt;': '>',
+                                            '&amp;': '&',
+                                            '&quot;': '"',
+                                            '&#x27;': '\'',
+                                            '&#x60;': '`'
+                                        };
+                                        Object.keys(patterns).forEach(k => { s = s.split(k).join(patterns[k]) });
+                                        const symbol = j === 0 ? "" : " ";
+                                        const words = props.pages.word.split(" ");
+                                        if (words.some(w => w.toLowerCase() === s.toLowerCase())) {
+                                            return <span key={j}>{symbol}<b>{s}</b></span>;
+                                        } else if (words.some(w => (w.toLowerCase() + ",") === s.toLowerCase())) {
+                                            return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>,</span>;
+                                        } else if (words.some(w => (w.toLowerCase() + ",\"") === s.toLowerCase())) {
+                                            return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>{",\""}</span>;
+                                        } else if (words.some(w => (w.toLowerCase() + ".") === s.toLowerCase())) {
+                                            return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>.</span>;
+                                        } else if (words.some(w => (w.toLowerCase() + ")") === s.toLowerCase())) {
+                                            return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>{")"}</span>;
+                                        } else if (words.some(w => (w.toLowerCase() + "\"") === s.toLowerCase())) {
+                                            return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>{"\""}</span>;
+                                        } else if (words.some(w => ("(" + w.toLowerCase()) === s.toLowerCase())) {
+                                            return <span key={j}>{symbol}{"("}<b>{s.substr(1)}</b></span>;
+                                        } else if (words.some(w => ("\"" + w.toLowerCase()) === s.toLowerCase())) {
+                                            return <span key={j}>{symbol}{"\""}<b>{s.substr(1)}</b></span>;
+                                        } else if (words.some(w => ("\"\"" + w.toLowerCase()) === s.toLowerCase())) {
+                                            return <span key={j}>{symbol}{"\"\""}<b>{s.substr(1)}</b></span>;
+                                        } else {
+                                            return <span key={j}>{symbol}{s}</span>;
+                                        }
+                                    })}
+                                    <br />
+                                    <a href={"https://en.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">
+                                        {"Check the Wikipedia page for " + page.word + " >>"}
+                                    </a>
+                                </td>
+                            </tr>
+                        ))
                     :
                     <tr><td>Loading...</td><td></td></tr>}
             </tbody>

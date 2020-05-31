@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
+import { Button } from 'reactstrap';
 import { Link } from 'react-router-dom';
 import { actionCreators } from '../store/WikiWalks';
-//import { getEnglishDate } from '../common/functions';
-//import Head from './Helmet';
+import Head from './Helmet';
 
 class Top extends Component {
 
@@ -28,27 +28,24 @@ class Top extends Component {
 
     render() {
         const { categories } = this.state;
-        const description = `This is a list of the Wikipedia pages about . Please check the list below to know about !`;
-        const arrDesc = description.split(". ");
-        const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
         return (
             <div>
-                {/*<Head
-                    title={title}
-                    desc={description}
-                />*/}
+                <Head
+                    title={"Wiki Ninja"}
+                    desc={"This website introduces you articles of Wikipedia for each category!"}
+                />
                 <h1>Welcome to Wiki Ninja!</h1>
                 <br />
                 <p>
                     Do you know Wikipedia? It is the best online dictionary in the world!<br />
-                    This website introduces you articles of Wikipedia for each theme!
+                    This website introduces you articles of Wikipedia for each category!
                 </p>
                 <br />
                 <table className='table table-striped'>
                     <thead>
                         <tr>
                             <th>Category Name</th>
-                            <th>Number of Words</th>
+                            <th>Number of Keywords</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -58,7 +55,7 @@ class Top extends Component {
                                     {<Link to={"/category/" + category.category.split(" ").join("_")}>{category.category}</Link>}
                                 </td>
                                 <td>
-                                    {category.cnt} words
+                                    {category.cnt} Keywords
                                 </td>
                             </tr>
                         )
@@ -66,6 +63,13 @@ class Top extends Component {
                             <tr><td>Loading...</td><td></td></tr>}
                     </tbody>
                 </table>
+                <hr />
+                <Link to="/all">
+                    <center>
+                        <Button><b>{"Check all keywords"}</b></Button>
+                    </center>
+                </Link>
+                <br />
             </div>
         );
     }
