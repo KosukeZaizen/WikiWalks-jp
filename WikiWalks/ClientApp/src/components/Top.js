@@ -32,7 +32,7 @@ class Top extends Component {
             <div>
                 <Head
                     title={"Wiki Ninja"}
-                    desc={"This website introduces you articles of Wikipedia for each category!"}
+                    desc={"This website introduces you to articles of Wikipedia for each category!"}
                 />
                 <h1>Welcome to Wiki Ninja!</h1>
                 <br />
