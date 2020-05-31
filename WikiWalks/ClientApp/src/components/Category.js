@@ -68,7 +68,7 @@ class Category extends Component {
                 {lineChangeDesc}
                 <br />
                 <hr />
-                <h2>Keywords about {category}</h2>
+                <h2>{`Keywords about ${category}`}</h2>
                 <table className='table table-striped'>
                     <thead>
                         <tr>

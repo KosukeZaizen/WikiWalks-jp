@@ -87,7 +87,7 @@ class PagesForTheTitles extends Component {
                 {lineChangeDesc}
                 <br />
                 <hr />
-                <h2>Pages about {word}</h2>
+                <h2>{`Pages about ${word}`}</h2>
                 {renderTable(this.props)}
                 <hr />
                 {categories && categories.length > 0 && categories.map((c, i) => (
@@ -135,25 +135,25 @@ function renderTable(props) {
                                         const symbol = j === 0 ? "" : " ";
                                         const words = props.pages.word.split(" ");
                                         if (words.some(w => w.toLowerCase() === s.toLowerCase())) {
-                                            return <span key={j}>{symbol}<b>{s}</b></span>;
+                                            return <React.Fragment key={j}>{symbol}<b>{s}</b></React.Fragment>;
                                         } else if (words.some(w => (w.toLowerCase() + ",") === s.toLowerCase())) {
-                                            return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>,</span>;
+                                            return <React.Fragment key={j}>{symbol}<b>{s.slice(0, -1)}</b>,</React.Fragment>;
                                         } else if (words.some(w => (w.toLowerCase() + ",\"") === s.toLowerCase())) {
-                                            return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>{",\""}</span>;
+                                            return <React.Fragment key={j}>{symbol}<b>{s.slice(0, -1)}</b>{",\""}</React.Fragment>;
                                         } else if (words.some(w => (w.toLowerCase() + ".") === s.toLowerCase())) {
-                                            return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>.</span>;
+                                            return <React.Fragment key={j}>{symbol}<b>{s.slice(0, -1)}</b>.</React.Fragment>;
                                         } else if (words.some(w => (w.toLowerCase() + ")") === s.toLowerCase())) {
-                                            return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>{")"}</span>;
+                                            return <React.Fragment key={j}>{symbol}<b>{s.slice(0, -1)}</b>{")"}</React.Fragment>;
                                         } else if (words.some(w => (w.toLowerCase() + "\"") === s.toLowerCase())) {
-                                            return <span key={j}>{symbol}<b>{s.slice(0, -1)}</b>{"\""}</span>;
+                                            return <React.Fragment key={j}>{symbol}<b>{s.slice(0, -1)}</b>{"\""}</React.Fragment>;
                                         } else if (words.some(w => ("(" + w.toLowerCase()) === s.toLowerCase())) {
-                                            return <span key={j}>{symbol}{"("}<b>{s.substr(1)}</b></span>;
+                                            return <React.Fragment key={j}>{symbol}{"("}<b>{s.substr(1)}</b></React.Fragment>;
                                         } else if (words.some(w => ("\"" + w.toLowerCase()) === s.toLowerCase())) {
-                                            return <span key={j}>{symbol}{"\""}<b>{s.substr(1)}</b></span>;
+                                            return <React.Fragment key={j}>{symbol}{"\""}<b>{s.substr(1)}</b></React.Fragment>;
                                         } else if (words.some(w => ("\"\"" + w.toLowerCase()) === s.toLowerCase())) {
-                                            return <span key={j}>{symbol}{"\"\""}<b>{s.substr(1)}</b></span>;
+                                            return <React.Fragment key={j}>{symbol}{"\"\""}<b>{s.substr(1)}</b></React.Fragment>;
                                         } else {
-                                            return <span key={j}>{symbol}{s}</span>;
+                                            return <React.Fragment key={j}>{symbol}{s}</React.Fragment>;
                                         }
                                     })}
                                     <br />
