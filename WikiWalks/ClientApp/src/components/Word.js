@@ -33,7 +33,7 @@ class PagesForTheTitles extends Component {
     render() {
         const { wordId, categories } = this.props.pages;
         const word = this.props.pages.word || "";
-        const cat = categories && categories.sort(c => c.cnt)[0];
+        const cat = categories && categories.sort((c1, c2) => c2.cnt - c1.cnt)[0];
         const category = cat && cat.category;
         const categoryForUrl = category && category.split(" ").join("_");
         const description = `This is a list of the Wikipedia pages about "${word}". Please check the list below to learn about "${word}"!`;
@@ -66,7 +66,7 @@ class PagesForTheTitles extends Component {
                                 </Link>
                             </span>
                             :
-                            <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
+                            word && <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
                                 <Link to={"/all"} itemProp="item" style={{ marginRight: "5px", marginLeft: "5px" }}>
                                     <span itemProp="name">
                                         {"All Keywords"}
