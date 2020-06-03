@@ -133,6 +133,15 @@ function renderTable(props) {
                 {pages && pages.length > 0 ?
                     pages
                         .sort((page1, page2) => page2.snippet.split(word).length - page1.snippet.split(word).length)
+                        .sort((page1, page2) => {
+                            if (page2.wordId === wordId) {
+                                return 1;
+                            } else if (page1.wordId === wordId) {
+                                return -1;
+                            } else {
+                                return 0;
+                            }
+                        })
                         .map((page, i) => (
                             <tr key={i}>
                                 <td>
