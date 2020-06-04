@@ -47,12 +47,19 @@ order by cnt desc;
             var pages = new List<Page>();
 
             string sql = @"
+select wordsForCategory.wordId, wordsForCategory.word, wordsForCategory.snippet, count(wr.targetWordId) as cnt from
+(
 select c.wordId, w.word, w.snippet 
 from category as c 
 inner join word as w 
 on c.wordId = w.wordId 
-and c.category like @category;
-";
+and c.category like @category
+) as wordsForCategory
+left outer join WordReference as wr
+on wordsForCategory.wordId = wr.targetWordId
+group by wordsForCategory.wordId, wordsForCategory.word, wordsForCategory.snippet
+order by cnt desc
+;";
 
             var result = con.ExecuteSelect(sql, new Dictionary<string, object[]> { { "@category", new object[2] { SqlDbType.NVarChar, category } } });
 
@@ -60,23 +67,9 @@ and c.category like @category;
             {
                 var page = new Page();
                 page.wordId = (int)e["wordId"];
-
-                var res = con.ExecuteSelect($"select wr.sourceWordId, w.word, w.snippet from WordReference as wr inner join word as w on wr.sourceWordId = w.wordId and targetWordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, page.wordId } } });
-                page.referenceCount = res.Count();
-
                 page.word = (string)e["word"];
                 page.snippet = (string)e["snippet"];
-
-                //page.categories = new List<object>();
-                //var result2 = con.ExecuteSelect($"select category, count(*) as cnt from category where wordId = @wordId group by category;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, page.wordId } } });
-                //result2.ForEach((f) =>
-                //{
-                //    page.categories.Add(new
-                //    {
-                //        category = (string)f["category"],
-                //        cnt = (int)f["cnt"]
-                //    });
-                //});
+                page.referenceCount = (int)e["cnt"];
 
                 pages.Add(page);
             });
@@ -96,39 +89,44 @@ and c.category like @category;
             var result1 = con.ExecuteSelect($"select word from word where wordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
             string word = (string)result1.FirstOrDefault()["word"];
 
-            var result2 = con.ExecuteSelect($"select wr.sourceWordId, w.word, w.snippet from WordReference as wr inner join word as w on wr.sourceWordId = w.wordId and targetWordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
+            var result2 = con.ExecuteSelect(@"
+select firstRef.sourceWordId, firstRef.word, firstRef.snippet, count(wwrr.targetWordId) as cnt from WordReference as wwrr
+right outer join (
+select wr.sourceWordId, w.word, w.snippet 
+from WordReference as wr 
+inner join word as w 
+on wr.sourceWordId = w.wordId 
+and targetWordId = @wordId
+) as firstRef
+on firstRef.sourceWordId = wwrr.targetWordId
+group by firstRef.sourceWordId, firstRef.word, firstRef.snippet
+order by cnt desc
+", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
+
             result2.ForEach((e) =>
             {
                 var page = new Page();
                 page.wordId = (int)e["sourceWordId"];
 
-                var res = con.ExecuteSelect($"select wr.sourceWordId from WordReference as wr inner join word as w on wr.sourceWordId = w.wordId and targetWordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, page.wordId } } });
-                page.referenceCount = res.Count();
-
                 page.word = (string)e["word"];
                 page.snippet = (string)e["snippet"];
-
-                //page.categories = new List<object>();
-                //var result3 = con.ExecuteSelect($"select category, count(*) as cnt from category where wordId = @wordId group by category;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, page.wordId } } });
-                //result3.ForEach((f) =>
-                //{
-                //    page.categories.Add(new
-                //    {
-                //        category = (string)f["category"],
-                //        cnt = (int)f["cnt"]
-                //    });
-                //});
+                page.referenceCount = (int)e["cnt"];
 
                 pages.Add(page);
             });
 
-            //var result4 = con.ExecuteSelect($"select category from Category where wordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
-            //result4.ForEach((e) =>
-            //{
-            //    categories.Add((string)e["category"]);
-            //});
-
-            var result3 = con.ExecuteSelect($"select category, count(*) as cnt from category where wordId = @wordId group by category;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
+            var result3 = con.ExecuteSelect(@"
+select category, count(*) as cnt 
+from (
+	select wordId, category, count(*) as cnt1 from Category as c 
+	inner join WordReference as r 
+	on c.wordId = r.targetWordId 
+	group by wordId, category
+	having category in (select distinct category  from category where wordId = @wordId) and count(*) > 4
+) as rel
+group by category
+order by cnt desc;
+", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
             result3.ForEach((f) =>
             {
                 categories.Add(new
@@ -163,9 +161,7 @@ order by cnt desc;
                 var page = new Page();
                 page.wordId = (int)e["wordId"];
                 page.word = (string)e["word"];
-
-                var res = con.ExecuteSelect($"select wr.sourceWordId, w.word, w.snippet from WordReference as wr inner join word as w on wr.sourceWordId = w.wordId and targetWordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, page.wordId } } });
-                page.referenceCount = res.Count();
+                page.referenceCount = (int)e["cnt"];
 
                 pages.Add(page);
             });

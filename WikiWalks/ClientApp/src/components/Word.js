@@ -15,11 +15,6 @@ class PagesForTheTitles extends Component {
     fetchData() {
         const wordId = this.props.match.params.wordId;
         this.props.requestPagesForTheTitle(wordId);
-
-        const page = this.props.pages && this.props.pages[0];
-        const publishDate = page && page.publishDate.split("T").shift();
-
-        publishDate && this.props.requestTitlesForTheDate(publishDate.split("-").join(""));
     }
 
     componentDidUpdate(previousProps) {
