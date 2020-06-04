@@ -13,8 +13,8 @@ class PagesForTheTitles extends Component {
     }
 
     fetchData() {
-        const titleId = this.props.match.params.wordId;
-        this.props.requestPagesForTheTitle(titleId);
+        const wordId = this.props.match.params.wordId;
+        this.props.requestPagesForTheTitle(wordId);
 
         const page = this.props.pages && this.props.pages[0];
         const publishDate = page && page.publishDate.split("T").shift();
@@ -32,6 +32,9 @@ class PagesForTheTitles extends Component {
 
     render() {
         const { wordId, categories } = this.props.pages;
+
+        if (("" + wordId) !== this.props.match.params.wordId) return <p>Loading...</p>;
+
         const word = this.props.pages.word || "";
         const cat = categories && categories.sort((c1, c2) => c2.cnt - c1.cnt)[0];
         const category = cat && cat.category;
@@ -39,6 +42,8 @@ class PagesForTheTitles extends Component {
         const description = `This is a list of the Wikipedia pages about "${word}". Please check the list below to learn about "${word}"!`;
         const arrDesc = description.split(". ");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
+
+
         return (
             <div>
                 <Head
