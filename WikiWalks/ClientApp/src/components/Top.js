@@ -32,7 +32,7 @@ class Top extends Component {
         return (
             <div>
                 <Head
-                    title={"Wiki Ninja"}
+                    title={"うぃき忍者"}
                     desc={desctiprtion}
                 />
                 <h1><b>うぃき忍者</b> へようこそ</h1>
@@ -53,7 +53,7 @@ class Top extends Component {
                         {categories.length > 0 ? categories.map(category =>
                             <tr key={category.category}>
                                 <td>
-                                    {<Link to={"/category/" + category.category.split(" ").join("_")}>{category.category}</Link>}
+                                    {<Link to={"/category/" + encodeURIComponent(category.category.split(" ").join("_"))}>{category.category}</Link>}
                                 </td>
                                 <td>
                                     {category.cnt} Keywords

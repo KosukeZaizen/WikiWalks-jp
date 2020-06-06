@@ -27,13 +27,13 @@ class Category extends Component {
 
     render() {
         const { pages } = this.state;
-        const description = `Wikipedia記事に含まれるキーワードの一覧です。各キーワードをクリックすると、関連記事へのリンクをご参照頂けます。`;
+        const description = `Wikipedia記事に含まれるキーワードの一覧です。各キーワードを毎に、最大500記事のWikipediaページをご紹介します。`;
         const arrDesc = description.split("。");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && "。"}<br /></span>);
         return (
             <div>
                 <Head
-                    title={"All Keywords"}
+                    title={"キーワード一覧"}
                     desc={description}
                 />
                 <div className="breadcrumbs" itemScope itemType="https://schema.org/BreadcrumbList" style={{ textAlign: "left" }}>

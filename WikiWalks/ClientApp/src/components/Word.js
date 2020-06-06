@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { actionCreators } from '../store/WikiWalks';
 import Head from './Helmet';
 import AnchorLink from 'react-anchor-link-smooth-scroll';
+import { Button } from 'reactstrap';
 
 class PagesForTheTitles extends Component {
 
@@ -34,8 +35,8 @@ class PagesForTheTitles extends Component {
         const word = this.props.pages.word || "";
         const cat = categories && categories.sort((c1, c2) => c2.cnt - c1.cnt)[0];
         const category = cat && cat.category;
-        const categoryForUrl = category && category.split(" ").join("_");
-        const description = `「${word}」に関するWikipedia記事の一覧です。下記のリンクをクリックして、「${word}」に関する詳細情報をご確認ください。`;
+        const categoryForUrl = category && encodeURIComponent(category.split(" ").join("_"));
+        const description = `「${word}」に関するWikipedia記事の一覧です。記事内で「${word}」に関する話題に触れているページや、「${word}」と関連の深いページをご紹介します。`;
         const arrDesc = description.split("。");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && "。"}<br /></span>);
 
@@ -70,7 +71,7 @@ class PagesForTheTitles extends Component {
                             word && <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
                                 <Link to={"/all"} itemProp="item" style={{ marginRight: "5px", marginLeft: "5px" }}>
                                     <span itemProp="name">
-                                        {"全てのキーワード"}
+                                        {"キーワード一覧"}
                                     </span>
                                     <meta itemProp="position" content="2" />
                                 </Link>
@@ -145,7 +146,7 @@ function renderTable(props) {
                         })
                         .map((page, i) => (
                             <tr key={i}>
-                                <td>
+                                <td style={{ fontWeight: "bold" }}>
                                     {page.wordId !== wordId && page.referenceCount > 4 ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
                                 </td>
                                 <td>
@@ -165,9 +166,16 @@ function renderTable(props) {
                                         </React.Fragment>;
                                     })}
                                     <br />
-                                    <a href={"https://ja.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">
-                                        {"「" + page.word + "」のWikipediaページを開く >>"}
-                                    </a>
+                                    <Button
+                                        size="sm"
+                                        color="dark"
+                                        href={"https://ja.wikipedia.org/wiki/" + page.word.split(" ").join("_")}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ marginTop: 7}}
+                                    >
+                                        {"「" + page.word + "」のWikipediaページを開く"}
+                                    </Button>
                                 </td>
                             </tr>
                         ))
@@ -199,7 +207,7 @@ class RenderOtherTable extends Component {
     }
 
     fetchData = async () => {
-        const url = `api/WikiWalks/getWordsForCategory?category=${this.props.c.category}`;
+        const url = `api/WikiWalks/getWordsForCategory?category=${encodeURIComponent(this.props.c.category)}`;
         const response = await fetch(url);
         const pages = await response.json();
         this.setState({ pages });
@@ -221,7 +229,7 @@ class RenderOtherTable extends Component {
                 <tbody>
                     {pages.length > 0 ? pages.map(page =>
                         <tr key={page.wordId}>
-                            <td>
+                            <td style={{fontWeight: "bold"}}>
                                 {(page.wordId !== wordId && page.referenceCount > 4) ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
                             </td>
                             <td>
@@ -241,9 +249,16 @@ class RenderOtherTable extends Component {
                                     </React.Fragment>;
                                 })}
                                 <br />
-                                <a href={"https://ja.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">
-                                    {"「" + page.word + "」のWikipediaページを開く >>"}
-                                </a>
+                                <Button
+                                    size="sm"
+                                    color="dark"
+                                    href={"https://ja.wikipedia.org/wiki/" + page.word.split(" ").join("_")}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    style={{ marginTop: 7 }}
+                                >
+                                    {"「" + page.word + "」のWikipediaページを開く"}
+                                </Button>
                             </td>
                         </tr>
                     )
