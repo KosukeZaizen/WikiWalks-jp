@@ -27,9 +27,9 @@ class Category extends Component {
 
     render() {
         const { pages } = this.state;
-        const description = `This is a list of keywords from Wikipedia! Choose a keyword you are interested in!`;
-        const arrDesc = description.split("! ");
-        const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
+        const description = `Wikipedia記事に含まれるキーワードの一覧です。各キーワードをクリックすると、関連記事へのリンクをご参照頂けます。`;
+        const arrDesc = description.split("。");
+        const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && "。"}<br /></span>);
         return (
             <div>
                 <Head
@@ -48,21 +48,21 @@ class Category extends Component {
                     {" > "}
                     <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
                         <span itemProp="name" style={{ marginRight: "5px", marginLeft: "5px" }}>
-                            {"All Keywords"}
+                            {"キーワード一覧"}
                         </span>
                         <meta itemProp="position" content="2" />
                     </span>
                 </div>
                 <hr />
-                <h1>Keywords</h1>
+                <h1>キーワード一覧</h1>
                 <br />
                 {lineChangeDesc}
                 <br />
                 <table className='table table-striped'>
                     <thead>
                         <tr>
-                            <th>Keywords</th>
-                            <th>Found Articles</th>
+                            <th>キーワード</th>
+                            <th>記事数</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -72,7 +72,7 @@ class Category extends Component {
                                     <Link to={"/word/" + page.wordId}>{page.word}</Link>
                                 </td>
                                 <td>
-                                    {page.referenceCount} pages
+                                    {page.referenceCount} 記事
                                 </td>
                             </tr>
                         )

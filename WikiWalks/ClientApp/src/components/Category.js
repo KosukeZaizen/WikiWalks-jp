@@ -36,9 +36,9 @@ class Category extends Component {
 
     render() {
         const { pages, category } = this.state;
-        const description = `This is a list of the keywords about "${category ? category.split("\"").join("") : "..."}". Please check the words below to learn about "${category ? category.split("\"").join("") : "..."}"!`;
-        const arrDesc = description.split(". ");
-        const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
+        const description = `「${category ? category.split("\"").join("") : "..."}」に関するキーワードの一覧です。下記のリンクから${category ? category.split("\"").join("") : "..."}に関する情報をご確認ください。`;
+        const arrDesc = description.split("。");
+        const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && "。"}<br /></span>);
         return (
             <div>
                 <Head
@@ -68,12 +68,12 @@ class Category extends Component {
                 {lineChangeDesc}
                 <br />
                 <hr />
-                <h2>{`Keywords about ${category}`}</h2>
+                <h2>{`${category}に関するキーワード`}</h2>
                 <table className='table table-striped'>
                     <thead>
                         <tr>
-                            <th>Keywords</th>
-                            <th>Found Articles</th>
+                            <th>キーワード</th>
+                            <th>記事数</th>
                         </tr>
                     </thead>
                     <tbody>

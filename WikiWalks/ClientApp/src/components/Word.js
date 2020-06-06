@@ -7,6 +7,7 @@ import Head from './Helmet';
 import AnchorLink from 'react-anchor-link-smooth-scroll';
 
 class PagesForTheTitles extends Component {
+
     componentDidMount() {
         // This method is called when the component is first added to the document
         this.fetchData();
@@ -34,9 +35,9 @@ class PagesForTheTitles extends Component {
         const cat = categories && categories.sort((c1, c2) => c2.cnt - c1.cnt)[0];
         const category = cat && cat.category;
         const categoryForUrl = category && category.split(" ").join("_");
-        const description = `This is a list of the Wikipedia pages about "${word}". Please check the list below to learn about "${word}"!`;
-        const arrDesc = description.split(". ");
-        const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && ". "}<br /></span>);
+        const description = `「${word}」に関するWikipedia記事の一覧です。下記のリンクをクリックして、「${word}」に関する詳細情報をご確認ください。`;
+        const arrDesc = description.split("。");
+        const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && "。"}<br /></span>);
 
 
         return (
@@ -69,7 +70,7 @@ class PagesForTheTitles extends Component {
                             word && <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
                                 <Link to={"/all"} itemProp="item" style={{ marginRight: "5px", marginLeft: "5px" }}>
                                     <span itemProp="name">
-                                        {"All Keywords"}
+                                        {"全てのキーワード"}
                                     </span>
                                     <meta itemProp="position" content="2" />
                                 </Link>
@@ -94,7 +95,7 @@ class PagesForTheTitles extends Component {
                         <center><p style={{ fontWeight: "bold", fontSize: "large" }}>Index</p></center>
                         <hr />
                         {word ? <ul>
-                            <li><AnchorLink href={`#Pages about ${word}`}>{`Pages about ${word}`}</AnchorLink></li>
+                            <li><AnchorLink href={`#Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</AnchorLink></li>
                             {categories.map((c, i) => (
                                 <li key={i}><AnchorLink href={"#" + c.category}>{c.category}</AnchorLink></li>
                             ))}
@@ -105,7 +106,7 @@ class PagesForTheTitles extends Component {
                     </div>
                 }
                 <hr />
-                <h2 id={`Pages about ${word}`}>{`Pages about ${word}`}</h2>
+                <h2 id={`Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</h2>
                 {renderTable(this.props)}
                 {categories && categories.length > 0 && categories.map((c, i) => (
                     <RenderOtherTable
@@ -122,11 +123,11 @@ class PagesForTheTitles extends Component {
 function renderTable(props) {
     const { pages, wordId, word } = props.pages;
     return (
-        <table className='table table-striped'>
+        <table className='table table-striped' style={{ wordBreak: "break-all" }}>
             <thead>
                 <tr>
-                    <th>Page Title</th>
-                    <th>Snippet</th>
+                    <th style={{minWidth: 100}}>タイトル</th>
+                    <th>内容</th>
                 </tr>
             </thead>
             <tbody>
@@ -148,7 +149,7 @@ function renderTable(props) {
                                     {page.wordId !== wordId && page.referenceCount > 4 ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
                                 </td>
                                 <td>
-                                    {page.snippet.split(" ").map((s, j) => {
+                                    {page.snippet.split(word).map((s, j) => {
                                         const patterns = {
                                             '&lt;': '<',
                                             '&gt;': '>',
@@ -158,33 +159,14 @@ function renderTable(props) {
                                             '&#x60;': '`'
                                         };
                                         Object.keys(patterns).forEach(k => { s = s.split(k).join(patterns[k]) });
-                                        const symbol = j === 0 ? "" : " ";
-                                        const words = props.pages.word.split(" ");
-                                        if (words.some(w => w.toLowerCase() === s.toLowerCase())) {
-                                            return <React.Fragment key={j}>{symbol}<b>{s}</b></React.Fragment>;
-                                        } else if (words.some(w => (w.toLowerCase() + ",") === s.toLowerCase())) {
-                                            return <React.Fragment key={j}>{symbol}<b>{s.slice(0, -1)}</b>,</React.Fragment>;
-                                        } else if (words.some(w => (w.toLowerCase() + ",\"") === s.toLowerCase())) {
-                                            return <React.Fragment key={j}>{symbol}<b>{s.slice(0, -1)}</b>{",\""}</React.Fragment>;
-                                        } else if (words.some(w => (w.toLowerCase() + ".") === s.toLowerCase())) {
-                                            return <React.Fragment key={j}>{symbol}<b>{s.slice(0, -1)}</b>.</React.Fragment>;
-                                        } else if (words.some(w => (w.toLowerCase() + ")") === s.toLowerCase())) {
-                                            return <React.Fragment key={j}>{symbol}<b>{s.slice(0, -1)}</b>{")"}</React.Fragment>;
-                                        } else if (words.some(w => (w.toLowerCase() + "\"") === s.toLowerCase())) {
-                                            return <React.Fragment key={j}>{symbol}<b>{s.slice(0, -1)}</b>{"\""}</React.Fragment>;
-                                        } else if (words.some(w => ("(" + w.toLowerCase()) === s.toLowerCase())) {
-                                            return <React.Fragment key={j}>{symbol}{"("}<b>{s.substr(1)}</b></React.Fragment>;
-                                        } else if (words.some(w => ("\"" + w.toLowerCase()) === s.toLowerCase())) {
-                                            return <React.Fragment key={j}>{symbol}{"\""}<b>{s.substr(1)}</b></React.Fragment>;
-                                        } else if (words.some(w => ("\"\"" + w.toLowerCase()) === s.toLowerCase())) {
-                                            return <React.Fragment key={j}>{symbol}{"\"\""}<b>{s.substr(1)}</b></React.Fragment>;
-                                        } else {
-                                            return <React.Fragment key={j}>{symbol}{s}</React.Fragment>;
-                                        }
+                                        return <React.Fragment key={j}>
+                                            {j !== 0 && <span style={{ fontWeight: "bold" }}>{word}</span>}
+                                            {s}
+                                        </React.Fragment>;
                                     })}
                                     <br />
-                                    <a href={"https://en.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">
-                                        {"Check the Wikipedia page for " + page.word + " >>"}
+                                    <a href={"https://ja.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">
+                                        {"「" + page.word + "」のWikipediaページを開く >>"}
                                     </a>
                                 </td>
                             </tr>
@@ -229,11 +211,11 @@ class RenderOtherTable extends Component {
         return (<React.Fragment>
             <hr />
             <h2 id={c.category}>{c.category}</h2>
-            <table className='table table-striped'>
+            <table className='table table-striped' style={{ wordBreak: "break-all" }}>
                 <thead>
                     <tr>
-                        <th>Page Title</th>
-                        <th>Snippet</th>
+                        <th style={{ minWidth: 100 }}>タイトル</th>
+                        <th>内容</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -243,10 +225,24 @@ class RenderOtherTable extends Component {
                                 {(page.wordId !== wordId && page.referenceCount > 4) ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
                             </td>
                             <td>
-                                {page.snippet}
+                                {page.snippet.split(pages.word).map((s, j) => {
+                                    const patterns = {
+                                        '&lt;': '<',
+                                        '&gt;': '>',
+                                        '&amp;': '&',
+                                        '&quot;': '"',
+                                        '&#x27;': '\'',
+                                        '&#x60;': '`'
+                                    };
+                                    Object.keys(patterns).forEach(k => { s = s.split(k).join(patterns[k]) });
+                                    return <React.Fragment key={j}>
+                                        {j !== 0 && <span style={{ fontWeight: "bold" }}>{pages.word}</span>}
+                                        {s}
+                                    </React.Fragment>;
+                                })}
                                 <br />
-                                <a href={"https://en.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">
-                                    {"Check the Wikipedia page for " + page.word + " >>"}
+                                <a href={"https://ja.wikipedia.org/wiki/" + page.word.split(" ").join("_")} target="_blank" rel="noopener noreferrer">
+                                    {"「" + page.word + "」のWikipediaページを開く >>"}
                                 </a>
                             </td>
                         </tr>

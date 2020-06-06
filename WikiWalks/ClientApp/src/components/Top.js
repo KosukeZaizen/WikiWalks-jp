@@ -28,24 +28,25 @@ class Top extends Component {
 
     render() {
         const { categories } = this.state;
+        const desctiprtion = "このウェブサイトでは、特定のキーワードに関連するWikipedia記事をご紹介させて頂きます。";
         return (
             <div>
                 <Head
                     title={"Wiki Ninja"}
-                    desc={"This website introduces you to articles of Wikipedia for each category!"}
+                    desc={desctiprtion}
                 />
-                <h1>Welcome to Wiki Ninja!</h1>
+                <h1><b>うぃき忍者</b> へようこそ</h1>
                 <br />
                 <p>
-                    Do you know Wikipedia? It is the best online dictionary in the world!<br />
-                    This website introduces you to articles of Wikipedia for each category!
+                    調べ物をするなら、世界最高のオンライン辞書「Wikipedia」を使わない手はありません。<br />
+                    {desctiprtion}
                 </p>
                 <br />
                 <table className='table table-striped'>
                     <thead>
                         <tr>
-                            <th>Category Name</th>
-                            <th>Number of Keywords</th>
+                            <th>カテゴリー</th>
+                            <th>キーワード</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,7 +67,7 @@ class Top extends Component {
                 <hr />
                 <Link to="/all">
                     <center>
-                        <Button><b>{"Check all keywords"}</b></Button>
+                        <Button><b>{"全てのキーワードを確認する"}</b></Button>
                     </center>
                 </Link>
                 <br />

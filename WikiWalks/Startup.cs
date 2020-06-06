@@ -62,7 +62,7 @@ namespace WikiWalks
                 string url = context.Request.Path.Value;
                 if (url.EndsWith("sitemap.xml"))
                 {
-                    var domain = "https://wiki.lingual-ninja.com";
+                    var domain = "https://wiki-jp.lingual-ninja.com";
                     var lstSitemap = new List<Dictionary<string, string>>();
 
                     //top page
@@ -155,8 +155,8 @@ namespace WikiWalks
             var result = con.ExecuteSelect(@"
 select category, count(*) as cnt 
 from (
-	select wordId, category, count(*) as cnt1 from Category as c 
-	inner join WordReference as r 
+	select wordId, category, count(*) as cnt1 from CategoryJp as c 
+	inner join WordReferenceJp as r 
 	on c.wordId = r.targetWordId 
 	group by wordId, category
 	having count(*) > 4
@@ -181,8 +181,8 @@ order by cnt desc;
             var pages = new List<int>();
 
             string sql = @"
-select w.wordId, w.word, count(*) as cnt from word as w
-inner join WordReference as wr
+select w.wordId, w.word, count(*) as cnt from WordJp as w
+inner join WordReferenceJp as wr
 on w.wordId = wr.targetWordId
 group by w.wordId, w.word
 having count(*) > 4

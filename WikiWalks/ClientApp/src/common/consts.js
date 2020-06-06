@@ -1,2 +1,2 @@
-export const siteUrl = "wiki.lingual-ninja.com";
-export const azureUrl = "wikiwalks.azurewebsites.net";
+export const siteUrl = "wiki-jp.lingual-ninja.com";
+export const azureUrl = "wikiwalks-jp.azurewebsites.net";
