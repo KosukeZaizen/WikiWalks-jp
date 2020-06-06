@@ -19,8 +19,8 @@ namespace RelatedPages.Controllers
             var result = con.ExecuteSelect(@"
 select category, count(*) as cnt 
 from (
-	select wordId, category, count(*) as cnt1 from Category as c 
-	inner join WordReference as r 
+	select wordId, category, count(*) as cnt1 from CategoryJp as c 
+	inner join WordReferenceJp as r 
 	on c.wordId = r.targetWordId 
 	group by wordId, category
 	having count(*) > 4
@@ -50,12 +50,12 @@ order by cnt desc;
 select wordsForCategory.wordId, wordsForCategory.word, wordsForCategory.snippet, count(wr.targetWordId) as cnt from
 (
 select c.wordId, w.word, w.snippet 
-from category as c 
-inner join word as w 
+from CategoryJp as c 
+inner join WordJp as w 
 on c.wordId = w.wordId 
 and c.category like @category
 ) as wordsForCategory
-left outer join WordReference as wr
+left outer join WordReferenceJp as wr
 on wordsForCategory.wordId = wr.targetWordId
 group by wordsForCategory.wordId, wordsForCategory.word, wordsForCategory.snippet
 order by cnt desc
@@ -86,15 +86,15 @@ order by cnt desc
             var pages = new List<Page>();
             var categories = new List<object>();
 
-            var result1 = con.ExecuteSelect($"select word from word where wordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
+            var result1 = con.ExecuteSelect($"select word from WordJp where wordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
             string word = (string)result1.FirstOrDefault()["word"];
 
             var result2 = con.ExecuteSelect(@"
-select firstRef.sourceWordId, firstRef.word, firstRef.snippet, count(wwrr.targetWordId) as cnt from WordReference as wwrr
+select firstRef.sourceWordId, firstRef.word, firstRef.snippet, count(wwrr.targetWordId) as cnt from WordReferenceJp as wwrr
 right outer join (
 select wr.sourceWordId, w.word, w.snippet 
-from WordReference as wr 
-inner join word as w 
+from WordReferenceJp as wr 
+inner join WordJp as w 
 on wr.sourceWordId = w.wordId 
 and targetWordId = @wordId
 ) as firstRef
@@ -118,11 +118,11 @@ order by cnt desc
             var result3 = con.ExecuteSelect(@"
 select category, count(*) as cnt 
 from (
-	select wordId, category, count(*) as cnt1 from Category as c 
-	inner join WordReference as r 
+	select wordId, category, count(*) as cnt1 from CategoryJp as c 
+	inner join WordReferenceJp as r 
 	on c.wordId = r.targetWordId 
 	group by wordId, category
-	having category in (select distinct category  from category where wordId = @wordId) and count(*) > 4
+	having category in (select distinct category from CategoryJp where wordId = @wordId) and count(*) > 4
 ) as rel
 group by category
 order by cnt desc;
@@ -146,8 +146,8 @@ order by cnt desc;
             var pages = new List<Page>();
 
             string sql = @"
-select w.wordId, w.word, count(*) as cnt from word as w
-inner join WordReference as wr
+select w.wordId, w.word, count(*) as cnt from WordJp as w
+inner join WordReferenceJp as wr
 on w.wordId = wr.targetWordId
 group by w.wordId, w.word
 having count(*) > 4
