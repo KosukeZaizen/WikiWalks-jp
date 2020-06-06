@@ -36,7 +36,7 @@ class PagesForTheTitles extends Component {
         const cat = categories && categories.sort((c1, c2) => c2.cnt - c1.cnt)[0];
         const category = cat && cat.category;
         const categoryForUrl = category && encodeURIComponent(category.split(" ").join("_"));
-        const description = `「${word}」に関するWikipedia記事の一覧です。記事内で「${word}」に関する話題に触れているページや、「${word}」と関連の深いページをご紹介します。`;
+        const description = `「${word}」に関するWikipedia記事の一覧です。「${word}」の話題に触れているページや、「${word}」と関連が深いページをご紹介します。`;
         const arrDesc = description.split("。");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && "。"}<br /></span>);
 
@@ -300,13 +300,6 @@ class ReturnToIndex extends React.Component {
         }
     }
 
-    componentDidUpdate(preciousProps) {
-        if ((preciousProps.refForReturnToIndex && preciousProps.refForReturnToIndex.current)
-            !== (this.props.refForReturnToIndex && this.props.refForReturnToIndex.current)) {
-            this.judge();
-        }
-    }
-
     componentWillUnmount() {
         window.removeEventListener('scroll', this.judge);
     }
@@ -318,7 +311,7 @@ class ReturnToIndex extends React.Component {
 
         const height = window.innerHeight;
 
-        const offsetY = elem.getBoundingClientRect().top + 300;
+        const offsetY = elem.getBoundingClientRect().top + 700;
         const t_position = offsetY - height;
 
         if (t_position >= 0) {
@@ -352,11 +345,9 @@ class ReturnToIndex extends React.Component {
                 fontSize: "large",
                 backgroundColor: "#DDD",
             }}>
-                <center>
-                    <AnchorLink href={`#indexOfVocabLists`}>
-                        {"▲ 目次に戻る ▲"}
-                    </AnchorLink>
-                </center>
+                <AnchorLink href={`#indexOfVocabLists`}>
+                    {"▲ 目次に戻る ▲"}
+                </AnchorLink>
             </div>
         );
     }
