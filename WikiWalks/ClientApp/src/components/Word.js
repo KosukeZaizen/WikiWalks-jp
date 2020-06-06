@@ -89,11 +89,12 @@ class PagesForTheTitles extends Component {
                 <h1>{word}</h1>
                 <br />
                 {lineChangeDesc}
+                <span id="indexOfVocabLists"></span>
                 <br />
                 {
                     categories && categories.length > 0 &&
                     <div style={{ maxWidth: "500px", padding: "10px", marginBottom: "10px", border: "5px double gray" }}>
-                        <center><p style={{ fontWeight: "bold", fontSize: "large" }}>Index</p></center>
+                        <center><p style={{ fontWeight: "bold", fontSize: "large" }}>目次</p></center>
                         <hr />
                         {word ? <ul>
                             <li><AnchorLink href={`#Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</AnchorLink></li>
@@ -116,6 +117,16 @@ class PagesForTheTitles extends Component {
                         wordId={wordId}
                     />
                 ))}
+                {
+                    categories && categories.length > 0 &&
+                    <React.Fragment>
+                        <ReturnToIndex
+                            refForReturnToIndex={this.refForReturnToIndex}
+                            criteriaId={`Pages about ${word}`}
+                        />
+                        <div style={{ height: "50px" }}></div>
+                    </React.Fragment>
+                }
             </div>
         );
     }
@@ -127,7 +138,7 @@ function renderTable(props) {
         <table className='table table-striped' style={{ wordBreak: "break-all" }}>
             <thead>
                 <tr>
-                    <th style={{minWidth: 100}}>タイトル</th>
+                    <th style={{ minWidth: 100 }}>タイトル</th>
                     <th>内容</th>
                 </tr>
             </thead>
@@ -172,7 +183,7 @@ function renderTable(props) {
                                         href={"https://ja.wikipedia.org/wiki/" + page.word.split(" ").join("_")}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        style={{ marginTop: 7}}
+                                        style={{ marginTop: 7 }}
                                     >
                                         {"「" + page.word + "」のWikipediaページを開く"}
                                     </Button>
@@ -229,7 +240,7 @@ class RenderOtherTable extends Component {
                 <tbody>
                     {pages.length > 0 ? pages.map(page =>
                         <tr key={page.wordId}>
-                            <td style={{fontWeight: "bold"}}>
+                            <td style={{ fontWeight: "bold" }}>
                                 {(page.wordId !== wordId && page.referenceCount > 4) ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
                             </td>
                             <td>
@@ -267,6 +278,87 @@ class RenderOtherTable extends Component {
                 </tbody>
             </table>
         </React.Fragment>);
+    }
+}
+
+class ReturnToIndex extends React.Component {
+
+    constructor(props) {
+        super(props);
+        this.state = {
+            showReturnToIndex: false,
+        }
+
+        window.addEventListener('scroll', this.judge);
+    }
+
+    componentDidMount() {
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                this.judge();
+            }, i * 1000);
+        }
+    }
+
+    componentDidUpdate(preciousProps) {
+        if ((preciousProps.refForReturnToIndex && preciousProps.refForReturnToIndex.current)
+            !== (this.props.refForReturnToIndex && this.props.refForReturnToIndex.current)) {
+            this.judge();
+        }
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener('scroll', this.judge);
+    }
+
+    judge = () => {
+        const { criteriaId } = this.props;
+        const elem = document.getElementById(criteriaId);
+        if (!elem) return;
+
+        const height = window.innerHeight;
+
+        const offsetY = elem.getBoundingClientRect().top + 300;
+        const t_position = offsetY - height;
+
+        if (t_position >= 0) {
+            // 上側の時
+            this.setState({
+                showReturnToIndex: false,
+            });
+        } else {
+            // 下側の時
+            this.setState({
+                showReturnToIndex: true,
+            });
+        }
+    }
+
+    render() {
+        const { showReturnToIndex } = this.state;
+        return (
+            <div style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                position: "fixed",
+                bottom: 0,
+                left: 0,
+                zIndex: showReturnToIndex ? 99999900 : 0,
+                width: window.innerWidth,
+                height: "40px",
+                opacity: showReturnToIndex ? 1.0 : 0,
+                transition: "all 2s ease",
+                fontSize: "large",
+                backgroundColor: "#DDD",
+            }}>
+                <center>
+                    <AnchorLink href={`#indexOfVocabLists`}>
+                        {"▲ 目次に戻る ▲"}
+                    </AnchorLink>
+                </center>
+            </div>
+        );
     }
 }
 
