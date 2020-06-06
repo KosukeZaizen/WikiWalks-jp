@@ -185,7 +185,7 @@ function renderTable(props) {
                                         rel="noopener noreferrer"
                                         style={{ marginTop: 7 }}
                                     >
-                                        {"「" + page.word + "」のWikipediaページを開く"}
+                                        「{page.word}」の<span style={{ display: "inline-block" }}>Wikipedia</span><span style={{ display: "inline-block" }}>ページ</span>を開く
                                     </Button>
                                 </td>
                             </tr>
@@ -268,7 +268,7 @@ class RenderOtherTable extends Component {
                                     rel="noopener noreferrer"
                                     style={{ marginTop: 7 }}
                                 >
-                                    {"「" + page.word + "」のWikipediaページを開く"}
+                                    「{page.word}」の<span style={{ display: "inline-block" }}>Wikipedia</span><span style={{ display: "inline-block" }}>ページ</span>を開く
                                 </Button>
                             </td>
                         </tr>
