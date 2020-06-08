@@ -162,6 +162,15 @@ function renderTable(props) {
                                 </td>
                                 <td>
                                     {page.snippet
+                                        .replace(new RegExp("<$"), "")
+                                        .replace(new RegExp("<b$"), "")
+                                        .replace(new RegExp("<bo$"), "")
+                                        .replace(new RegExp("<bol$"), "")
+                                        .replace(new RegExp("<bold$"), "")
+                                        .replace(new RegExp("</b$"), "")
+                                        .replace(new RegExp("</bo$"), "")
+                                        .replace(new RegExp("</bol$"), "")
+                                        .replace(new RegExp("</bold$"), "")
                                         .split('&lt;').join('<')
                                         .split('&gt;').join('>')
                                         .split('&amp;').join('&')
@@ -245,6 +254,15 @@ class RenderOtherTable extends Component {
                             <td>
                                 {
                                     page.snippet
+                                        .replace(new RegExp("<$"), "")
+                                        .replace(new RegExp("<b$"), "")
+                                        .replace(new RegExp("<bo$"), "")
+                                        .replace(new RegExp("<bol$"), "")
+                                        .replace(new RegExp("<bold$"), "")
+                                        .replace(new RegExp("</b$"), "")
+                                        .replace(new RegExp("</bo$"), "")
+                                        .replace(new RegExp("</bol$"), "")
+                                        .replace(new RegExp("</bold$"), "")
                                         .split('&lt;').join('<')
                                         .split('&gt;').join('>')
                                         .split('&amp;').join('&')
