@@ -145,7 +145,14 @@ function renderTable(props) {
             <tbody>
                 {pages && pages.length > 0 ?
                     pages
-                        .sort((page1, page2) => page2.snippet.split(word).length - page1.snippet.split(word).length)
+                        .sort((page1, page2) => page2.snippet
+                            .split("<bold>").join("")
+                            .split("</bold>").join("")
+                            .split(word).length
+                            - page1.snippet.split("<bold>").join("")
+                                .split("</bold>").join("")
+                                .split(word).length
+                        )
                         .sort((page1, page2) => {
                             if (page2.wordId === wordId) {
                                 return 1;
