@@ -48,7 +48,7 @@ order by cnt desc;
 
             string sql = @"
 select wordsForCategory.wordId, wordsForCategory.word, 
-max(case when wr.targetWordId = wr.sourceWordId then wr.snippet else ' ' end) as snippet, 
+max(case when wr.targetWordId = wr.sourceWordId then wr.snippet else ' ' + wr.snippet end) as snippet, 
 count(wr.targetWordId) as cnt 
 from
 (

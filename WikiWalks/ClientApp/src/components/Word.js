@@ -260,7 +260,7 @@ class RenderOtherTable extends Component {
                             </td>
                             <td>
                                 {
-                                    page.snippet
+                                    page.snippet.trim()
                                         .replace(new RegExp("<$"), "")
                                         .replace(new RegExp("<b$"), "")
                                         .replace(new RegExp("<bo$"), "")
