@@ -161,21 +161,20 @@ function renderTable(props) {
                                     {page.wordId !== wordId && page.referenceCount > 4 ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
                                 </td>
                                 <td>
-                                    {page.snippet.split(word).map((s, j) => {
-                                        const patterns = {
-                                            '&lt;': '<',
-                                            '&gt;': '>',
-                                            '&amp;': '&',
-                                            '&quot;': '"',
-                                            '&#x27;': '\'',
-                                            '&#x60;': '`'
-                                        };
-                                        Object.keys(patterns).forEach(k => { s = s.split(k).join(patterns[k]) });
-                                        return <React.Fragment key={j}>
-                                            {j !== 0 && <span style={{ fontWeight: "bold" }}>{word}</span>}
-                                            {s}
-                                        </React.Fragment>;
-                                    })}
+                                    {page.snippet
+                                        .split('&lt;').join('<')
+                                        .split('&gt;').join('>')
+                                        .split('&amp;').join('&')
+                                        .split('&quot;').join('"')
+                                        .split('&#x27;').join('\'')
+                                        .split('&#x60;').join('`')
+                                        .split("<bold>").map(bo => bo.split("</bold>")).flat().map((s, j) => {
+                                            if (j % 2 === 0) {
+                                                return <React.Fragment key={j}>{s}</React.Fragment>;
+                                            } else {
+                                                return <span key={j} style={{ fontWeight: "bold" }}>{s}</span>
+                                            }
+                                        })}
                                     <br />
                                     <Button
                                         size="sm"
@@ -244,21 +243,17 @@ class RenderOtherTable extends Component {
                                 {(page.wordId !== wordId && page.referenceCount > 4) ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
                             </td>
                             <td>
-                                {page.snippet.split(pages.word).map((s, j) => {
-                                    const patterns = {
-                                        '&lt;': '<',
-                                        '&gt;': '>',
-                                        '&amp;': '&',
-                                        '&quot;': '"',
-                                        '&#x27;': '\'',
-                                        '&#x60;': '`'
-                                    };
-                                    Object.keys(patterns).forEach(k => { s = s.split(k).join(patterns[k]) });
-                                    return <React.Fragment key={j}>
-                                        {j !== 0 && <span style={{ fontWeight: "bold" }}>{pages.word}</span>}
-                                        {s}
-                                    </React.Fragment>;
-                                })}
+                                {
+                                    page.snippet
+                                        .split('&lt;').join('<')
+                                        .split('&gt;').join('>')
+                                        .split('&amp;').join('&')
+                                        .split('&quot;').join('"')
+                                        .split('&#x27;').join('\'')
+                                        .split('&#x60;').join('`')
+                                        .split("<bold>").join("")
+                                        .split("</bold>").join("")
+                               }
                                 <br />
                                 <Button
                                     size="sm"
