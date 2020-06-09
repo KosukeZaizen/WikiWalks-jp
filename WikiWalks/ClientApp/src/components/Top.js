@@ -35,7 +35,7 @@ class Top extends Component {
                     title={"うぃき忍者"}
                     desc={desctiprtion}
                 />
-                <h1><b>うぃき忍者</b> へようこそ</h1>
+                <h1><span style={{ fontWeight: "bold", display: "inline-block" }}>うぃき忍者</span> へ <span style={{ display: "inline-block" }}>ようこそ</span></h1>
                 <br />
                 <p>
                     調べ物をするなら、世界最高のオンライン辞書「Wikipedia」を使わない手はありません。<br />
