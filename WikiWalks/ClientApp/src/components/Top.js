@@ -46,7 +46,10 @@ class Top extends Component {
                     <thead>
                         <tr>
                             <th>カテゴリー</th>
-                            <th>キーワード</th>
+                            <th><span style={{
+                                display: "inline-block",
+                                minWidth: 85,
+                            }}>キーワード</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -56,7 +59,7 @@ class Top extends Component {
                                     {<Link to={"/category/" + encodeURIComponent(category.category.split(" ").join("_"))}>{category.category}</Link>}
                                 </td>
                                 <td>
-                                    {category.cnt} Keywords
+                                    <span style={{ display: "inline-block" }}>{category.cnt} keywords</span>
                                 </td>
                             </tr>
                         )
