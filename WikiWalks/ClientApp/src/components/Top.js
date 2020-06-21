@@ -48,7 +48,7 @@ class Top extends Component {
                             <th>カテゴリー</th>
                             <th><span style={{
                                 display: "inline-block",
-                                minWidth: 85,
+                                minWidth: 90,
                             }}>キーワード</span></th>
                         </tr>
                     </thead>
