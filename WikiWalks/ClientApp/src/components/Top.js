@@ -22,7 +22,7 @@ class Top extends Component {
             const response = await fetch(url);
             const categories = await response.json();
             this.setState({ categories: categories.slice(0, 50) });
-            setTimeout(() => this.setState({ categories }), 100);
+            setTimeout(() => this.setState({ categories }), 500);
         }
         getData();
     }
