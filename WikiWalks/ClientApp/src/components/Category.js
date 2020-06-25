@@ -81,7 +81,10 @@ class Category extends Component {
                     <thead>
                         <tr>
                             <th>キーワード</th>
-                            <th>記事数</th>
+                            <th><span style={{
+                                display: "inline-block",
+                                minWidth: 70,
+                            }}>記事数</span></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -91,7 +94,7 @@ class Category extends Component {
                                     <Link to={"/word/" + page.wordId}>{page.word}</Link>
                                 </td>
                                 <td>
-                                    {page.referenceCount} pages
+                                    {page.referenceCount} 記事
                                 </td>
                             </tr>
                         )

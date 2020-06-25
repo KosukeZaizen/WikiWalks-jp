@@ -20,7 +20,8 @@ class Category extends Component {
             const url = `api/WikiWalks/getAllWords`;
             const response = await fetch(url);
             const pages = await response.json();
-            this.setState({ pages });
+            this.setState({ pages: pages.slice(0, 50) });
+            setTimeout(() => this.setState({ pages }), 500);
         }
         getData();
     }
@@ -62,7 +63,10 @@ class Category extends Component {
                     <thead>
                         <tr>
                             <th>キーワード</th>
-                            <th>記事数</th>
+                            <th><span style={{
+                                display: "inline-block",
+                                minWidth: 70,
+                            }}>記事数</span></th>
                         </tr>
                     </thead>
                     <tbody>
