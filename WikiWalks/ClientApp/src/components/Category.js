@@ -74,7 +74,6 @@ class Category extends Component {
                 <h1>{category}</h1>
                 <br />
                 {lineChangeDesc}
-                <br />
                 <hr />
                 <h2>{`${category}に関するキーワード`}</h2>
                 <table className='table table-striped'>
