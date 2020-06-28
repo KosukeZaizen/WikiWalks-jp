@@ -118,27 +118,14 @@ order by cnt desc;
                 var con = new DBCon();
                 var cs = new List<Category>();
 
-                var result = con.ExecuteSelect(@"
-select category, count(*) as cnt 
-from (
-	select wordId, category, count(*) as cnt1 from 
-	(
-	select wordId, category from CategoryJp A where exists (select * from CategoryJp B where A.category = B.category and wordId = @wordId)
-	) as c 
-	inner join WordReferenceJp as r 
-	on c.wordId = r.targetWordId 
-	group by wordId, category
-	having count(*) > 4
-) as rel
-group by category
-order by cnt desc;
-", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
+                var result = con.ExecuteSelect("select category from CategoryJp where wordId = @wordId", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
                 result.ForEach((f) =>
                 {
-                    var c = new Category();
-                    c.category = (string)f["category"];
-                    c.cnt = (int)f["cnt"];
-                    cs.Add(c);
+                    var c = allCategoriesGetter.getCategories().FirstOrDefault(ca => ca.category == (string)f["category"]);
+                    if (c != null)
+                    {
+                        cs.Add(c);
+                    }
                 });
                 return cs;
             });
@@ -146,7 +133,7 @@ order by cnt desc;
             Task<string> wordTask = Task.Run(() =>
             {
                 var con = new DBCon();
-                var result = con.ExecuteSelect($"select word from WordJp where wordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
+                var result = con.ExecuteSelect("select word from WordJp where wordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
                 return (string)result.FirstOrDefault()["word"];
             });
 
