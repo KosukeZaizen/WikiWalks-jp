@@ -194,15 +194,24 @@ namespace WikiWalks
             var allPages = new List<Page>();
 
             string sql = @"
-select w.wordId, w.word, wr.cnt, wr.snippet from WordJp as w
-inner join (
-select targetWordId, count(targetWordId) cnt,
-LTRIM(max(case when targetWordId = sourceWordId then snippet else ' ' + snippet end)) as snippet
-from WordReferenceJp
-group by targetWordId having count(targetWordId) > 4
-) as wr
-on w.wordId = wr.targetWordId
-order by cnt desc;
+select
+wr1.wordId,
+wr1.word,
+wr1.cnt,
+isnull(
+	(select top(1) snippet from WordReferenceJp wr3 where wr3.sourceWordId = wr3.targetWordId and wr3.sourceWordId = wr1.wordId),
+	(select top(1) snippet from WordReferenceJp wr2 where wr2.sourceWordId = wr1.wordId)
+) as snippet
+from (
+	select w.wordId, w.word, wr.cnt from WordJp as w
+	inner join (
+		select targetWordId, count(targetWordId) cnt
+		from WordReferenceJp
+		group by targetWordId having count(targetWordId) > 4
+	) as wr
+	on w.wordId = wr.targetWordId
+) as wr1
+order by wr1.cnt desc;
 ";
 
             var result = con.ExecuteSelect(sql);
