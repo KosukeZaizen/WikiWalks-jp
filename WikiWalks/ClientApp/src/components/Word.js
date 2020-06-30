@@ -9,6 +9,14 @@ import { Button } from 'reactstrap';
 
 class PagesForTheTitles extends Component {
 
+    sectionStyle = {
+        display: "block",
+        borderTop: "1px solid #dcdcdc",
+        paddingTop: 12,
+        marginTop: 12,
+        marginBottom: 30,
+    };
+
     componentDidMount() {
         // This method is called when the component is first added to the document
         this.fetchData();
@@ -83,48 +91,50 @@ class PagesForTheTitles extends Component {
                         <meta itemProp="position" content="3" />
                     </span>
                 </div>
-                <hr />
-                <h1>{word}</h1>
-                <br />
-                {lineChangeDesc}
-                <span id="indexOfVocabLists"></span>
-                <br />
-                {
-                    categories && categories.length > 0 &&
-                    <div style={{ maxWidth: "500px", padding: "10px", marginBottom: "10px", border: "5px double gray" }}>
-                        <center><p style={{ fontWeight: "bold", fontSize: "large" }}>目次</p></center>
-                        <hr />
-                        {word ? <ul>
-                            <li><AnchorLink href={`#Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</AnchorLink></li>
-                            {categories.map((c, i) => (
-                                <li key={i}><AnchorLink href={"#" + c.category}>{c.category}</AnchorLink></li>
-                            ))}
-                        </ul>
-                            :
-                            <center>Loading...<br /></center>
-                        }
-                    </div>
-                }
-                <hr />
-                <h2 id={`Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</h2>
-                {renderTable(this.props)}
-                {categories && categories.length > 0 && categories.map((c, i) => (
-                    <RenderOtherTable
-                        key={i}
-                        c={c}
-                        wordId={wordId}
-                    />
-                ))}
-                {
-                    categories && categories.length > 0 &&
-                    <React.Fragment>
-                        <ReturnToIndex
-                            refForReturnToIndex={this.refForReturnToIndex}
-                            criteriaId={`Pages about ${word}`}
+                <article style={this.sectionStyle}>
+                    <h1>{word}</h1>
+                    <br />
+                    {lineChangeDesc}
+                    <span id="indexOfVocabLists"></span>
+                    <br />
+                    {
+                        categories && categories.length > 0 &&
+                        <div style={{ maxWidth: "500px", padding: "10px", marginBottom: "30px", border: "5px double gray" }}>
+                            <center><p style={{ fontWeight: "bold", fontSize: "large" }}>目次</p></center>
+                            {word ? <ul style={this.sectionStyle}>
+                                <li><AnchorLink href={`#Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</AnchorLink></li>
+                                {categories.map((c, i) => (
+                                    <li key={i}><AnchorLink href={"#" + c.category}>{c.category}</AnchorLink></li>
+                                ))}
+                            </ul>
+                                :
+                                <center>Loading...<br /></center>
+                            }
+                        </div>
+                    }
+                    <section style={this.sectionStyle}>
+                        <h2 id={`Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</h2>
+                        {renderTable(this.props)}
+                    </section>
+                    {categories && categories.length > 0 && categories.map((c, i) => (
+                        <RenderOtherTable
+                            key={i}
+                            c={c}
+                            wordId={wordId}
+                            sectionStyle={this.sectionStyle}
                         />
-                        <div style={{ height: "50px" }}></div>
-                    </React.Fragment>
-                }
+                    ))}
+                    {
+                        categories && categories.length > 0 &&
+                        <React.Fragment>
+                            <ReturnToIndex
+                                refForReturnToIndex={this.refForReturnToIndex}
+                                criteriaId={`Pages about ${word}`}
+                            />
+                            <div style={{ height: "50px" }}></div>
+                        </React.Fragment>
+                    }
+                </article>
             </div>
         );
     }
@@ -241,60 +251,61 @@ class RenderOtherTable extends Component {
         const { pages } = this.state;
         const { c, wordId } = this.props;
         return (<React.Fragment>
-            <hr />
-            <h2 id={c.category}>{c.category}</h2>
-            <table className='table table-striped' style={{ wordBreak: "break-all" }}>
-                <thead>
-                    <tr>
-                        <th style={{ minWidth: 100 }}>タイトル</th>
-                        <th>内容</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {pages.length > 0 ? pages.map(page =>
-                        <tr key={page.wordId}>
-                            <td style={{ fontWeight: "bold" }}>
-                                {(page.wordId !== wordId && page.referenceCount > 4) ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
-                            </td>
-                            <td>
-                                {
-                                    page.snippet
-                                        .replace(new RegExp("<$"), "")
-                                        .replace(new RegExp("<b$"), "")
-                                        .replace(new RegExp("<bo$"), "")
-                                        .replace(new RegExp("<bol$"), "")
-                                        .replace(new RegExp("<bold$"), "")
-                                        .replace(new RegExp("</b$"), "")
-                                        .replace(new RegExp("</bo$"), "")
-                                        .replace(new RegExp("</bol$"), "")
-                                        .replace(new RegExp("</bold$"), "")
-                                        .split('&lt;').join('<')
-                                        .split('&gt;').join('>')
-                                        .split('&amp;').join('&')
-                                        .split('&quot;').join('"')
-                                        .split('&#x27;').join('\'')
-                                        .split('&#x60;').join('`')
-                                        .split("<bold>").join("")
-                                        .split("</bold>").join("")
-                               }
-                                <br />
-                                <Button
-                                    size="sm"
-                                    color="dark"
-                                    href={"https://ja.wikipedia.org/wiki/" + page.word.split(" ").join("_")}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    style={{ marginTop: 7 }}
-                                >
-                                    「{page.word}」の<span style={{ display: "inline-block" }}>Wikipedia</span><span style={{ display: "inline-block" }}>ページ</span>を<span style={{ display: "inline-block" }}>開く</span>
-                                </Button>
-                            </td>
+            <section style={this.props.sectionStyle}>
+                <h2 id={c.category}>{c.category}</h2>
+                <table className='table table-striped' style={{ wordBreak: "break-all" }}>
+                    <thead>
+                        <tr>
+                            <th style={{ minWidth: 100 }}>タイトル</th>
+                            <th>内容</th>
                         </tr>
-                    )
-                        :
-                        <tr><td>Loading...</td><td></td></tr>}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {pages.length > 0 ? pages.map(page =>
+                            <tr key={page.wordId}>
+                                <td style={{ fontWeight: "bold" }}>
+                                    {(page.wordId !== wordId && page.referenceCount > 4) ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
+                                </td>
+                                <td>
+                                    {
+                                        page.snippet
+                                            .replace(new RegExp("<$"), "")
+                                            .replace(new RegExp("<b$"), "")
+                                            .replace(new RegExp("<bo$"), "")
+                                            .replace(new RegExp("<bol$"), "")
+                                            .replace(new RegExp("<bold$"), "")
+                                            .replace(new RegExp("</b$"), "")
+                                            .replace(new RegExp("</bo$"), "")
+                                            .replace(new RegExp("</bol$"), "")
+                                            .replace(new RegExp("</bold$"), "")
+                                            .split('&lt;').join('<')
+                                            .split('&gt;').join('>')
+                                            .split('&amp;').join('&')
+                                            .split('&quot;').join('"')
+                                            .split('&#x27;').join('\'')
+                                            .split('&#x60;').join('`')
+                                            .split("<bold>").join("")
+                                            .split("</bold>").join("")
+                                    }
+                                    <br />
+                                    <Button
+                                        size="sm"
+                                        color="dark"
+                                        href={"https://ja.wikipedia.org/wiki/" + page.word.split(" ").join("_")}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        style={{ marginTop: 7 }}
+                                    >
+                                        「{page.word}」の<span style={{ display: "inline-block" }}>Wikipedia</span><span style={{ display: "inline-block" }}>ページ</span>を<span style={{ display: "inline-block" }}>開く</span>
+                                    </Button>
+                                </td>
+                            </tr>
+                        )
+                            :
+                            <tr><td>Loading...</td><td></td></tr>}
+                    </tbody>
+                </table>
+            </section>
         </React.Fragment>);
     }
 }

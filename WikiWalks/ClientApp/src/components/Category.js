@@ -7,6 +7,13 @@ import Head from './Helmet';
 
 class Category extends Component {
 
+    sectionStyle = {
+        display: "block",
+        borderTop: "1px solid #dcdcdc",
+        paddingTop: 12,
+        marginTop: 12,
+    };
+
     constructor(props) {
         super(props);
 
@@ -70,37 +77,39 @@ class Category extends Component {
                         <meta itemProp="position" content="2" />
                     </span>
                 </div>
-                <hr />
-                <h1>{category}</h1>
-                <br />
-                {lineChangeDesc}
-                <hr />
-                <h2>{`${category}に関するキーワード`}</h2>
-                <table className='table table-striped'>
-                    <thead>
-                        <tr>
-                            <th>キーワード</th>
-                            <th><span style={{
-                                display: "inline-block",
-                                minWidth: 70,
-                            }}>記事数</span></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {pages.length > 0 ? pages.sort((p1, p2) => p2.referenceCount - p1.referenceCount).filter(page => page.referenceCount > 4).map(page =>
-                            <tr key={page.wordId}>
-                                <td>
-                                    <Link to={"/word/" + page.wordId}>{page.word}</Link>
+                <section style={this.sectionStyle}>
+                    <h1>{category}</h1>
+                    <br />
+                    {lineChangeDesc}
+                    <section style={this.sectionStyle}>
+                        <h2>{`${category}に関するキーワード`}</h2>
+                        <table className='table table-striped'>
+                            <thead>
+                                <tr>
+                                    <th>キーワード</th>
+                                    <th><span style={{
+                                        display: "inline-block",
+                                        minWidth: 70,
+                                    }}>記事数</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {pages.length > 0 ? pages.sort((p1, p2) => p2.referenceCount - p1.referenceCount).filter(page => page.referenceCount > 4).map(page =>
+                                    <tr key={page.wordId}>
+                                        <td>
+                                            <Link to={"/word/" + page.wordId}>{page.word}</Link>
+                                        </td>
+                                        <td>
+                                            {page.referenceCount} 記事
                                 </td>
-                                <td>
-                                    {page.referenceCount} 記事
-                                </td>
-                            </tr>
-                        )
-                            :
-                            <tr><td>Loading...</td><td></td></tr>}
-                    </tbody>
-                </table>
+                                    </tr>
+                                )
+                                    :
+                                    <tr><td>Loading...</td><td></td></tr>}
+                            </tbody>
+                        </table>
+                    </section>
+                </section>
             </div>
         );
     }
