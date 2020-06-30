@@ -101,7 +101,7 @@ class PagesForTheTitles extends Component {
                         categories && categories.length > 0 &&
                         <div style={{ maxWidth: "500px", padding: "10px", marginBottom: "30px", border: "5px double gray" }}>
                             <center><p style={{ fontWeight: "bold", fontSize: "large" }}>目次</p></center>
-                            {word ? <ul style={this.sectionStyle}>
+                            {word ? <ul style={{ ...this.sectionStyle, marginBottom: 0, }}>
                                 <li><AnchorLink href={`#Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</AnchorLink></li>
                                 {categories.map((c, i) => (
                                     <li key={i}><AnchorLink href={"#" + c.category}>{c.category}</AnchorLink></li>
