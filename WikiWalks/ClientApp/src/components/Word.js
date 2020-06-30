@@ -96,7 +96,6 @@ class PagesForTheTitles extends Component {
                     <br />
                     {lineChangeDesc}
                     <span id="indexOfVocabLists"></span>
-                    <br />
                     {
                         categories && categories.length > 0 &&
                         <div style={{ maxWidth: "500px", padding: "10px", marginBottom: "30px", border: "5px double gray" }}>
