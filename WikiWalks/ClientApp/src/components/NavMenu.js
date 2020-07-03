@@ -15,6 +15,7 @@ export default function NavMenu() {
                         href="https://wiki.lingual-ninja.com"
                         target="_blank"
                         rel="noopener noreferrer"
+                        hreflang="en"
                     >English</Button>
                 </Container>
             </Navbar>
