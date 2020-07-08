@@ -114,13 +114,16 @@ class PagesForTheTitles extends Component {
                             </div>
                         }
                         {
-                            pages && pages.length > 50 && <GoogleAd />
+                            pages && pages.length > 50 && <aside><GoogleAd /></aside>
                         }
                     </div>
                     <section style={this.sectionStyle}>
                         <h2 id={`Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</h2>
                         {renderTable(this.props)}
                     </section>
+                    {
+                        pages && pages.length > 50 && <aside><GoogleAd /></aside>
+                    }
                     {categories && categories.length > 0 && categories.map((c, i) => (
                         <RenderOtherTable
                             key={i}
