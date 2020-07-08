@@ -100,7 +100,7 @@ class PagesForTheTitles extends Component {
                     <div style={window.innerWidth > 991 ? { display: "flex" } : {}}>
                         {
                             categories && categories.length > 0 &&
-                            <div style={{ maxWidth: "500px", padding: "10px", marginBottom: "30px", border: "5px double gray" }}>
+                            <div style={{ maxWidth: "500px", padding: "10px", marginBottom: "30px", border: "5px double gray", width: "100%" }}>
                                 <center><p style={{ fontWeight: "bold", fontSize: "large" }}>目次</p></center>
                                 {word ? <ul style={{ ...this.sectionStyle, marginBottom: 0, }}>
                                     <li><AnchorLink href={`#Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</AnchorLink></li>
@@ -114,7 +114,7 @@ class PagesForTheTitles extends Component {
                             </div>
                         }
                         {
-                            pages && pages.length > 50 && <aside><GoogleAd /></aside>
+                            pages && pages.length > 50 && <aside style={{width: "100%"}}><GoogleAd /></aside>
                         }
                     </div>
                     <section style={this.sectionStyle}>
