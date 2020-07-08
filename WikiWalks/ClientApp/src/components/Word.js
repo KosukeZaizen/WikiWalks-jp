@@ -2,10 +2,11 @@ import React, { Component } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
 import { Link } from 'react-router-dom';
-import { actionCreators } from '../store/WikiWalks';
-import Head from './Helmet';
 import AnchorLink from 'react-anchor-link-smooth-scroll';
 import { Button } from 'reactstrap';
+import { actionCreators } from '../store/WikiWalks';
+import Head from './Helmet';
+import GoogleAd from './GoogleAd';
 
 class PagesForTheTitles extends Component {
 
@@ -34,7 +35,7 @@ class PagesForTheTitles extends Component {
     }
 
     render() {
-        const { wordId, categories } = this.props.pages;
+        const { wordId, categories, pages } = this.props.pages;
 
         if (("" + wordId) !== this.props.match.params.wordId) return <p>Loading...</p>;
 
@@ -96,21 +97,26 @@ class PagesForTheTitles extends Component {
                     <br />
                     {lineChangeDesc}
                     <span id="indexOfVocabLists"></span>
-                    {
-                        categories && categories.length > 0 &&
-                        <div style={{ maxWidth: "500px", padding: "10px", marginBottom: "30px", border: "5px double gray" }}>
-                            <center><p style={{ fontWeight: "bold", fontSize: "large" }}>目次</p></center>
-                            {word ? <ul style={{ ...this.sectionStyle, marginBottom: 0, }}>
-                                <li><AnchorLink href={`#Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</AnchorLink></li>
-                                {categories.map((c, i) => (
-                                    <li key={i}><AnchorLink href={"#" + c.category}>{c.category}</AnchorLink></li>
-                                ))}
-                            </ul>
-                                :
-                                <center>Loading...<br /></center>
-                            }
-                        </div>
-                    }
+                    <div style={window.innerWidth > 991 ? { display: "flex" } : {}}>
+                        {
+                            categories && categories.length > 0 &&
+                            <div style={{ maxWidth: "500px", padding: "10px", marginBottom: "30px", border: "5px double gray" }}>
+                                <center><p style={{ fontWeight: "bold", fontSize: "large" }}>目次</p></center>
+                                {word ? <ul style={{ ...this.sectionStyle, marginBottom: 0, }}>
+                                    <li><AnchorLink href={`#Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</AnchorLink></li>
+                                    {categories.map((c, i) => (
+                                        <li key={i}><AnchorLink href={"#" + c.category}>{c.category}</AnchorLink></li>
+                                    ))}
+                                </ul>
+                                    :
+                                    <center>Loading...<br /></center>
+                                }
+                            </div>
+                        }
+                        {
+                            pages && pages.length > 50 && <GoogleAd />
+                        }
+                    </div>
                     <section style={this.sectionStyle}>
                         <h2 id={`Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</h2>
                         {renderTable(this.props)}
