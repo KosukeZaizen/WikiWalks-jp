@@ -142,7 +142,7 @@ class PagesForTheTitles extends Component {
                             </div>
                         }
                         {
-                            pages && pages.length > 50 && <aside style={{width: "100%"}}><GoogleAd /></aside>
+                            pages && pages.length > 50 && <aside style={{ width: "100%", marginBottom: isWide ? 0 : 30 }}><GoogleAd /></aside>
                         }
                     </div>
                     <section style={this.sectionStyle}>
