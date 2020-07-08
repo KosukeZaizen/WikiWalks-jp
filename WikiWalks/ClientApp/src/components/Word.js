@@ -24,7 +24,7 @@ class PagesForTheTitles extends Component {
     }
 
     fetchData() {
-        const wordId = this.props.match.params.wordId;
+        const wordId = this.props.match.params.wordId.split("#")[0];
         this.props.requestPagesForTheTitle(wordId);
     }
 
