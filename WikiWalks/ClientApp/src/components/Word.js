@@ -82,7 +82,10 @@ class PagesForTheTitles extends Component {
                     desc={description}
                 />
                 {
-                    pages && pages.length > 50 && <GoogleAd />
+                    pages && pages.length > 50 &&
+                    <GoogleAd
+                        style={{ marginBottom: 20 }}
+                    />
                 }
                 <div className="breadcrumbs" itemScope itemType="https://schema.org/BreadcrumbList" style={{ textAlign: "left" }}>
                     <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
