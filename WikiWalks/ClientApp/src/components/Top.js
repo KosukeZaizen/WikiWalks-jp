@@ -24,7 +24,7 @@ class Top extends Component {
 
             for (let k in categories) {
                 this.setState({ categories: categories.slice(0, Number(k) + 1) });
-                await new Promise(resolve => setTimeout(() => resolve(), 50));
+                await new Promise(resolve => setTimeout(() => resolve(), 100));
             }
         }
         getData();
@@ -38,6 +38,7 @@ class Top extends Component {
                 <Head
                     title={"うぃき忍者"}
                     desc={desctiprtion}
+                    noad
                 />
                 <h1><span style={{ fontWeight: "bold", display: "inline-block" }}>うぃき忍者</span> へ <span style={{ display: "inline-block" }}>ようこそ</span></h1>
                 <br />
