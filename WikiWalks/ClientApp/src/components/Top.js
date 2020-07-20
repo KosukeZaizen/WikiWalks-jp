@@ -21,8 +21,11 @@ class Top extends Component {
             const url = `api/WikiWalks/getAllCategories`;
             const response = await fetch(url);
             const categories = await response.json();
-            this.setState({ categories: categories.slice(0, 100) });
-            setTimeout(() => this.setState({ categories }), 1000);
+
+            for (let k in categories) {
+                this.setState({ categories: categories.slice(0, Number(k) + 1) });
+                await new Promise(resolve => setTimeout(() => resolve(), 50));
+            }
         }
         getData();
     }
