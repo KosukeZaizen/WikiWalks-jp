@@ -186,91 +186,107 @@ function renderTable(pages, wordId, word) {
     const pageLoaded = pages && pages.length > 0;
 
     const data = pageLoaded && pages
-            .sort((page1, page2) => page2.snippet
-                .split("<bold>").join("")
+        .sort((page1, page2) => page2.snippet
+            .split("<bold>").join("")
+            .split("</bold>").join("")
+            .split(word).length
+            - page1.snippet.split("<bold>").join("")
                 .split("</bold>").join("")
                 .split(word).length
-                - page1.snippet.split("<bold>").join("")
-                    .split("</bold>").join("")
-                    .split(word).length
-            )
-            .sort((page1, page2) => {
-                if (page2.wordId === wordId) {
-                    return 1;
-                } else if (page1.wordId === wordId) {
-                    return -1;
-                } else {
-                    return 0;
-                }
-            })
-            .map((page, i) => (
-                <tr key={i}>
-                    <td style={{ fontWeight: "bold" }}>
-                        {page.wordId !== wordId && page.referenceCount > 4 ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
-                    </td>
-                    <td>
-                        {page.snippet
-                            .replace(new RegExp("<$"), "")
-                            .replace(new RegExp("<b$"), "")
-                            .replace(new RegExp("<bo$"), "")
-                            .replace(new RegExp("<bol$"), "")
-                            .replace(new RegExp("<bold$"), "")
-                            .replace(new RegExp("</b$"), "")
-                            .replace(new RegExp("</bo$"), "")
-                            .replace(new RegExp("</bol$"), "")
-                            .replace(new RegExp("</bold$"), "")
-                            .split('&lt;').join('<')
-                            .split('&gt;').join('>')
-                            .split('&amp;').join('&')
-                            .split('&quot;').join('"')
-                            .split('&#x27;').join('\'')
-                            .split('&#x60;').join('`')
-                            .split("<bold>").map(bo => bo.split("</bold>")).flat().map((s, j) => {
-                                if (j % 2 === 0) {
-                                    return <React.Fragment key={j}>{s}</React.Fragment>;
-                                } else {
-                                    return <span key={j} style={{ fontWeight: "bold" }}>{s}</span>
-                                }
-                            })}
-                        <br />
-                        <Button
-                            size="sm"
-                            color="dark"
-                            href={"https://ja.wikipedia.org/wiki/" + page.word.split(" ").join("_")}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            style={{ marginTop: 7 }}
-                        >
-                            「{page.word}」の<span style={{ display: "inline-block" }}>Wikipedia</span><span style={{ display: "inline-block" }}>ページ</span>を<span style={{ display: "inline-block" }}>開く</span>
-                        </Button>
-                    </td>
-                </tr>
-            ));
+        )
+        .sort((page1, page2) => {
+            if (page2.wordId === wordId) {
+                return 1;
+            } else if (page1.wordId === wordId) {
+                return -1;
+            } else {
+                return 0;
+            }
+        })
+        .map((page, i) => (
+            <tr key={i}>
+                <td style={{ fontWeight: "bold", minWidth: 100 }}>
+                    {page.wordId !== wordId && page.referenceCount > 4 ? <Link to={"/word/" + page.wordId}>{page.word}</Link> : page.word}
+                </td>
+                <td>
+                    {page.snippet
+                        .replace(new RegExp("<$"), "")
+                        .replace(new RegExp("<b$"), "")
+                        .replace(new RegExp("<bo$"), "")
+                        .replace(new RegExp("<bol$"), "")
+                        .replace(new RegExp("<bold$"), "")
+                        .replace(new RegExp("</b$"), "")
+                        .replace(new RegExp("</bo$"), "")
+                        .replace(new RegExp("</bol$"), "")
+                        .replace(new RegExp("</bold$"), "")
+                        .split('&lt;').join('<')
+                        .split('&gt;').join('>')
+                        .split('&amp;').join('&')
+                        .split('&quot;').join('"')
+                        .split('&#x27;').join('\'')
+                        .split('&#x60;').join('`')
+                        .split("<bold>").map(bo => bo.split("</bold>")).flat().map((s, j) => {
+                            if (j % 2 === 0) {
+                                return <React.Fragment key={j}>{s}</React.Fragment>;
+                            } else {
+                                return <span key={j} style={{ fontWeight: "bold" }}>{s}</span>
+                            }
+                        })}
+                    <br />
+                    <Button
+                        size="sm"
+                        color="dark"
+                        href={"https://ja.wikipedia.org/wiki/" + page.word.split(" ").join("_")}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        style={{ marginTop: 7 }}
+                    >
+                        「{page.word}」の<span style={{ display: "inline-block" }}>Wikipedia</span><span style={{ display: "inline-block" }}>ページ</span>を<span style={{ display: "inline-block" }}>開く</span>
+                    </Button>
+                </td>
+            </tr>
+        ));
 
     return (
-        <table className='table table-striped' style={{ wordBreak: "break-all" }}>
-            <thead>
-                <tr>
-                    <th style={{ minWidth: 100 }}>タイトル</th>
-                    <th>内容</th>
-                </tr>
-            </thead>
-            <tbody>
-                {pageLoaded && data.shift()}
-                {
-                    pages && pages.length > 50 && <tr><td colSpan="2"><GoogleAd /></td></tr>
-                }
-                {pageLoaded && data.splice(0, 5)}
-                {
-                    pages && pages.length > 50 && <tr><td colSpan="2"><GoogleAd /></td></tr>
-                }
-                {pageLoaded ?
-                    data
-                    :
-                    <tr><td>Loading...</td><td></td></tr>
-                }
-            </tbody>
-        </table>
+        <React.Fragment>
+            {
+                <table className='table table-striped' style={{ wordBreak: "break-all" }}>
+                    <thead>
+                        <tr>
+                            <th>タイトル</th>
+                            <th>内容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {pageLoaded ?
+                            data.shift()
+                            :
+                            <tr><td>Loading...</td><td></td></tr>}
+                    </tbody>
+                </table>
+            }
+            {
+                pageLoaded &&
+                <React.Fragment>
+                    {
+                        pages.length > 50 && <GoogleAd />
+                    }
+                    <table className='table table-striped' style={{ wordBreak: "break-all" }}>
+                        <tbody>
+                            {data.splice(0, 5)}
+                        </tbody>
+                    </table >
+                    {
+                        pages.length > 50 && <GoogleAd />
+                    }
+                    <table className='table table-striped' style={{ wordBreak: "break-all" }}>
+                        <tbody>
+                            {data}
+                        </tbody>
+                    </table >
+                </React.Fragment>
+            }
+        </React.Fragment>
     );
 }
 
