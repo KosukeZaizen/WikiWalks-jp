@@ -53,6 +53,7 @@ class PagesForTheTitles extends Component {
         this.props.initialize();
         const wordId = this.props.match.params.wordId.split("#")[0];
         this.props.requestWord(wordId);
+        this.props.requestCategoriesForTheTitle(wordId);
         this.props.requestPagesForTheTitle(wordId);
     }
 
@@ -69,7 +70,8 @@ class PagesForTheTitles extends Component {
     render() {
         const isWide = this.state.screenWidth > 991;
 
-        const { wordId, categories, pages } = this.props.pages;
+        const wordId = Number(this.props.match.params.wordId.split("#")[0]);
+        const { pages, categories } = this.props;
         const word = this.props.word || "Loading...";
         const cat = categories && categories.sort((c1, c2) => c2.cnt - c1.cnt)[0];
         const category = cat && cat.category;
@@ -77,7 +79,6 @@ class PagesForTheTitles extends Component {
         const description = `「${word}」に関するWikipedia記事の一覧です。「${word}」の話題に触れているページや、「${word}」と関連が深いページをご紹介します。`;
         const arrDesc = description.split("。");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && "。"}<br /></span>);
-
 
         return (
             <div>
@@ -159,7 +160,7 @@ class PagesForTheTitles extends Component {
                     </div>
                     <section style={this.sectionStyle}>
                         <h2 id={`Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</h2>
-                        {renderTable(this.props)}
+                        {renderTable(pages, wordId, word)}
                     </section>
                     {
                         pages && pages.length > 50 && <GoogleAd />
@@ -170,6 +171,7 @@ class PagesForTheTitles extends Component {
                             c={c}
                             wordId={wordId}
                             sectionStyle={this.sectionStyle}
+                            pagesLoaded={pages && pages.length > 0}
                         />
                     ))}
                     {
@@ -188,8 +190,7 @@ class PagesForTheTitles extends Component {
     }
 }
 
-function renderTable(props) {
-    const { pages, wordId, word } = props.pages;
+function renderTable(pages, wordId, word) {
     return (
         <table className='table table-striped' style={{ wordBreak: "break-all" }}>
             <thead>
@@ -279,11 +280,11 @@ class RenderOtherTable extends Component {
     }
 
     componentDidMount() {
-        this.fetchData();
+        this.props.pagesLoaded && this.fetchData();
     }
 
     componentDidUpdate(previousProps) {
-        if (previousProps.c !== this.props.c) {
+        if (!previousProps.pagesLoaded && this.props.pagesLoaded) {
             this.fetchData();
         }
     }
