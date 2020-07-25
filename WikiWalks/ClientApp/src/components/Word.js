@@ -79,6 +79,7 @@ class PagesForTheTitles extends Component {
         const description = `「${word}」に関するWikipedia記事の一覧です。「${word}」の話題に触れているページや、「${word}」と関連が深いページをご紹介します。`;
         const arrDesc = description.split("。");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && "。"}<br /></span>);
+        const showAd = pages && pages.length > 50;
 
         return (
             <div>
@@ -86,6 +87,12 @@ class PagesForTheTitles extends Component {
                     title={word}
                     desc={description}
                 />
+                {
+                    showAd &&
+                    <GoogleAd
+                        style={{ marginBottom: 20 }}
+                    />
+                }
                 <div className="breadcrumbs" itemScope itemType="https://schema.org/BreadcrumbList" style={{ textAlign: "left" }}>
                     <span itemProp="itemListElement" itemScope itemType="http://schema.org/ListItem">
                         <Link to="/" itemProp="item" style={{ marginRight: "5px", marginLeft: "5px" }}>
@@ -146,7 +153,7 @@ class PagesForTheTitles extends Component {
                             </div>
                         }
                         {
-                            pages && pages.length > 50 &&
+                            showAd &&
                             <GoogleAd
                                 style={{ width: "100%", marginBottom: isWide ? 0 : 30 }}
                             />
@@ -156,6 +163,9 @@ class PagesForTheTitles extends Component {
                         <h2 id={`Pages about ${word}`}>{`「${word}」に関する記事の一覧`}</h2>
                         {renderTable(pages, wordId, word)}
                     </section>
+                    {
+                        showAd && <GoogleAd />
+                    }
                     {categories && categories.length > 0 && categories.map((c, i) => (
                         <RenderOtherTable
                             key={i}
@@ -172,6 +182,9 @@ class PagesForTheTitles extends Component {
                                 refForReturnToIndex={this.refForReturnToIndex}
                                 criteriaId={`Pages about ${word}`}
                             />
+                            {
+                                showAd && categories.length > 3 && <GoogleAd />
+                            }
                             <div style={{ height: "50px" }}></div>
                         </React.Fragment>
                     }
@@ -260,7 +273,7 @@ function renderTable(pages, wordId, word) {
                     <tbody>
                         {
                             pageLoaded ?
-                                data.shift()
+                                data.splice(0, 2)
                                 :
                                 <tr><td>Loading...</td><td></td></tr>
                         }
@@ -271,22 +284,60 @@ function renderTable(pages, wordId, word) {
                 pageLoaded &&
                 <React.Fragment>
                     {
-                        pages.length > 50 && <GoogleAd style={{padding: "10px 0"}} />
+                        pages.length > 50 && <GoogleAd style={{ padding: "10px 0" }} />
                     }
-                    <table className='table table-striped' style={{ wordBreak: "break-all", marginBottom: 0, }}>
-                        <tbody>
-                            <tr style={{ display: "none" }}></tr>
-                            {data.splice(0, 9)}
-                        </tbody>
-                    </table >
+                    {
+                        data.length > 0 &&
+                        <table className='table table-striped' style={{ wordBreak: "break-all", marginBottom: 0, }}>
+                            <tbody>
+                                {data.splice(0, 8)}
+                            </tbody>
+                        </table >
+                    }
                     {
                         pages.length > 50 && <GoogleAd style={{ padding: "10px 0" }} />
                     }
-                    <table className='table table-striped' style={{ wordBreak: "break-all" }}>
-                        <tbody>
-                            {data}
-                        </tbody>
-                    </table >
+                    {
+                        data.length > 0 &&
+                        <table className='table table-striped' style={{ wordBreak: "break-all", marginBottom: 0, }}>
+                            <tbody>
+                                {data.splice(0, 12)}
+                            </tbody>
+                        </table >
+                    }
+                    {
+                        pages.length > 50 && <GoogleAd style={{ padding: "10px 0" }} />
+                    }
+                    {
+                        data.length > 0 &&
+                        <table className='table table-striped' style={{ wordBreak: "break-all", marginBottom: 0, }}>
+                            <tbody>
+                                {data.splice(0, 12)}
+                            </tbody>
+                        </table >
+                    }
+                    {
+                        pages.length > 50 && <GoogleAd style={{ padding: "10px 0" }} />
+                    }
+                    {
+                        data.length > 0 &&
+                        <table className='table table-striped' style={{ wordBreak: "break-all", marginBottom: 0, }}>
+                            <tbody>
+                                {data.splice(0, 12)}
+                            </tbody>
+                        </table >
+                    }
+                    {
+                        pages.length > 50 && <GoogleAd style={{ padding: "10px 0" }} />
+                    }
+                    {
+                        data.length > 0 &&
+                        <table className='table table-striped' style={{ wordBreak: "break-all" }}>
+                            <tbody>
+                                {data}
+                            </tbody>
+                        </table >
+                    }
                 </React.Fragment>
             }
         </React.Fragment>
