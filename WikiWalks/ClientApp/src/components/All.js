@@ -34,7 +34,7 @@ class Category extends Component {
 
     render() {
         const { pages } = this.state;
-        const description = `Wikipedia記事に含まれるキーワードの一覧です。各キーワードを毎に、最大500記事のWikipediaページをご紹介します。`;
+        const description = `Wikipedia記事に含まれるキーワードの一覧です。各キーワード毎に、最大500記事のWikipediaページをご紹介します。`;
         const arrDesc = description.split("。");
         const lineChangeDesc = arrDesc.map((d, i) => <span key={i}>{d}{i < arrDesc.length - 1 && "。"}<br /></span>);
         return (
