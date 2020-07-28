@@ -216,8 +216,7 @@ from (
 	) as wr
 	on w.wordId = wr.targetWordId
 ) as wr1
-order by wr1.cnt desc;
-";
+;";
 
                 var result = con.ExecuteSelect(sql);
 
@@ -232,7 +231,7 @@ order by wr1.cnt desc;
                     allPages.Add(page);
                 });
 
-                pages = allPages;
+                pages = allPages.OrderByDescending(p => p.referenceCount).ToList();
             };
 
             //await DB_Util.runHeavySqlAsync(proc);
@@ -286,8 +285,7 @@ from CategoryJp C
 inner join (select targetWordId from WordReferenceJp group by targetWordId having count(targetWordId) > 4) as W
 on W.targetWordId = C.wordId 
 group by category
-order by cnt desc;
-");
+;");
 
                 result.ForEach((e) =>
                 {
@@ -298,7 +296,7 @@ order by cnt desc;
                     l.Add(c);
                 });
 
-                categories = l;
+                categories = l.OrderByDescending(c => c.cnt).ToList(); ;
             };
 
             //await DB_Util.runHeavySqlAsync(proc);
