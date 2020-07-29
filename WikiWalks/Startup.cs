@@ -271,7 +271,7 @@ from (
                         ).FirstOrDefault()["cnt"];
 
                 if (count > 4) {
-                    await Task.Delay(2);
+                    await Task.Delay(1);
                     var page = new Page();
                     page.wordId = wordId;
                     page.referenceCount = count;
