@@ -164,7 +164,7 @@ namespace WikiWalks
         private IEnumerable<Page> pages = new List<Page>();
         public AllWorsGetter()
         {
-            HurryToSetAllPages();
+            hurryToSetAllPages();
 
             Task.Run(async () =>
             {
@@ -177,7 +177,7 @@ namespace WikiWalks
                         int min = DateTime.Now.Minute % 20;
                         if (min == 0)
                         {
-                            setAllPages();
+                            await setAllPagesAsync();
                         }
                     }
                     catch (Exception ex) { }
@@ -190,7 +190,7 @@ namespace WikiWalks
             return pages;
         }
 
-        private void HurryToSetAllPages()
+        private void hurryToSetAllPages()
         {
             DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpPage, true); //開始記録
 
@@ -236,7 +236,7 @@ from (
         }
 
 
-    private void setAllPages()
+    private async Task setAllPagesAsync()
         {
             DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpPage, true); //開始記録
 
@@ -263,9 +263,12 @@ from (
 	from WordJp
 	where wordId = @wordId
 ) as wr1
-";
-            result.ForEach((e) =>
+;";
+
+            await Task.Delay(1000 * 45);
+            foreach (var e in result)
             {
+                await Task.Delay(5);
                 var page = new Page();
                 page.wordId = (int)e["targetWordId"];
                 page.referenceCount = (int)e["cnt"];
@@ -282,7 +285,7 @@ from (
                 }
 
                 allPages.Add(page);
-            });
+            }
 
             pages = allPages.OrderByDescending(p => p.referenceCount).ToList();
 
