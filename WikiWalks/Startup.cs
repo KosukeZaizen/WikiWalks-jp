@@ -174,7 +174,7 @@ namespace WikiWalks
                     {
                         await Task.Delay(1000 * 60);
 
-                        int min = DateTime.Now.Minute % 20;
+                        int min = DateTime.Now.Minute % 30;
                         if (min == 0)
                         {
                             await setAllPagesAsync();
@@ -308,8 +308,8 @@ from (
                     {
                         await Task.Delay(1000 * 60);
 
-                        int min = DateTime.Now.Minute % 20;
-                        if (min == 5)
+                        int min = DateTime.Now.Minute % 30;
+                        if (min == 10)
                         {
                             setAllCategories();
                         }
