@@ -242,7 +242,7 @@ from (
             var con = new DBCon();
             var allPages = new List<Page>();
 
-            var result = con.ExecuteSelect("select distinct targetWordId from WordReferenceJp;");
+            var result = con.ExecuteSelect("select wordId from WordJp;");
 
             string sqlForEachWord = @"
 select
@@ -263,7 +263,7 @@ from (
             await Task.Delay(1000 * 45);
             foreach (var e in result)
             {
-                await Task.Delay(2);
+                await Task.Delay(1);
                 var wordId = (int)e["targetWordId"];
                 var count = (int)con.ExecuteSelect(
                         sqlForCnt,
@@ -271,7 +271,7 @@ from (
                         ).FirstOrDefault()["cnt"];
 
                 if (count > 4) {
-                    await Task.Delay(3);
+                    await Task.Delay(2);
                     var page = new Page();
                     page.wordId = wordId;
                     page.referenceCount = count;
