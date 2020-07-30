@@ -388,7 +388,10 @@ group by category
                     )
                 .Count((a) => pages.Any(p => p.wordId == (int)a["wordId"]));
 
-                l.Add(c);
+                if (c.cnt > 0)
+                {
+                    l.Add(c);
+                }
             }
 
             categories = l.OrderByDescending(c => c.cnt).ToList();
