@@ -272,7 +272,7 @@ from (
                         ).FirstOrDefault()["cnt"];
 
                 if (count > 4) {
-                    await Task.Delay(1);
+                    await Task.Delay(3);
                     Page page = new Page
                     {
                         wordId = wordId,
