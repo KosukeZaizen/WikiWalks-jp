@@ -373,15 +373,26 @@ group by category
 
             var pages = allWorsGetter.getPages().ToList();
 
-            var result = con.ExecuteSelect("select distinct category from CategoryJp;");
+            var hashCategories = new HashSet<string>();
+            foreach (var page in pages)
+            {
+                await Task.Delay(4);
+                con.ExecuteSelect(
+                        "select category from CategoryJp where wordId = @wordId;",
+                        new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, page.wordId } } }
+                ).ForEach(cat =>
+                        {
+                            hashCategories.Add((string)cat["category"]);
+                        });
+            }
 
             await Task.Delay(1000 * 45);
-            foreach (var e in result)
+            foreach (var cat in hashCategories)
             {
                 await Task.Delay(5);
 
                 var c = new Category();
-                c.category = (string)e["category"];
+                c.category = cat;
 
                 c.cnt = con.ExecuteSelect(
                     "select wordId from CategoryJp where category like @category;",
