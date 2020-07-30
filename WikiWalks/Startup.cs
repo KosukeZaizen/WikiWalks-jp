@@ -376,7 +376,7 @@ group by category
             var hashCategories = new HashSet<string>();
             foreach (var page in pages)
             {
-                await Task.Delay(4);
+                await Task.Delay(6);
                 con.ExecuteSelect(
                         "select category from CategoryJp where wordId = @wordId;",
                         new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, page.wordId } } }
@@ -389,7 +389,7 @@ group by category
             await Task.Delay(1000 * 45);
             foreach (var cat in hashCategories)
             {
-                await Task.Delay(5);
+                await Task.Delay(7);
 
                 var c = new Category();
                 c.category = cat;
