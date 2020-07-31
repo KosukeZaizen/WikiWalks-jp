@@ -43,6 +43,8 @@ namespace WikiWalks
             var allWorsGetter = new AllWorsGetter();
             services.AddSingleton(allWorsGetter);
 
+            System.Threading.Thread.Sleep(1000 * 10);//DBへの負荷を考慮してSleep
+
             var allCategoriesGetter = new AllCategoriesGetter(allWorsGetter);
             services.AddSingleton(allCategoriesGetter);
         }
@@ -164,24 +166,28 @@ namespace WikiWalks
         private IEnumerable<Page> pages = new List<Page>();
         public AllWorsGetter()
         {
-            hurryToSetAllPages();
-
-            Task.Run(async () =>
+            try
             {
-                while (true)
-                {
-                    try
-                    {
-                        await Task.Delay(1000 * 60);
+                hurryToSetAllPages();
 
-                        if (DateTime.Now.Minute == 0)
+                Task.Run(async () =>
+                {
+                    while (true)
+                    {
+                        try
                         {
-                            await setAllPagesAsync();
+                            await Task.Delay(1000 * 60);
+
+                            if (DateTime.Now.Minute == 0)
+                            {
+                                await setAllPagesAsync();
+                            }
                         }
+                        catch (Exception ex) { }
                     }
-                    catch (Exception ex) { }
-                }
-            });
+                });
+            }
+            catch (Exception ex) { }
         }
 
         public IEnumerable<Page> getPages()
@@ -308,26 +314,30 @@ from (
 
         public AllCategoriesGetter(AllWorsGetter allWorsGetter)
         {
-            this.allWorsGetter = allWorsGetter;
-
-            hurryToSetAllCategories();
-
-            Task.Run(async () =>
+            try
             {
-                while (true)
-                {
-                    try
-                    {
-                        await Task.Delay(1000 * 60);
+                this.allWorsGetter = allWorsGetter;
 
-                        if (DateTime.Now.Minute == 10)
+                hurryToSetAllCategories();
+
+                Task.Run(async () =>
+                {
+                    while (true)
+                    {
+                        try
                         {
-                            await setAllCategoriesAsync();
+                            await Task.Delay(1000 * 60);
+
+                            if (DateTime.Now.Minute == 10)
+                            {
+                                await setAllCategoriesAsync();
+                            }
                         }
+                        catch (Exception ex) { }
                     }
-                    catch (Exception ex) { }
-                }
-            });
+                });
+            }
+            catch (Exception ex) { }
         }
 
         public IEnumerable<Category> getCategories()
