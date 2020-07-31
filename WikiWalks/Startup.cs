@@ -235,7 +235,7 @@ from (
         }
 
 
-    private async Task setAllPagesAsync()
+        private async Task setAllPagesAsync()
         {
             DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpPage, true); //開始記録
 
@@ -262,16 +262,17 @@ from (
 ;";
 
             await Task.Delay(1000 * 10);
-            for (var i = min; i <= max; i++)
+            for (var wordId = min; wordId <= max; wordId++)
             {
-                await Task.Delay(1);
-                var wordId = i;
+                await Task.Delay(2);
+
                 var count = (int)con.ExecuteSelect(
                         sqlForCnt,
                         new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } }
                         ).FirstOrDefault()["cnt"];
 
-                if (count > 4) {
+                if (count > 4)
+                {
                     await Task.Delay(3);
                     Page page = new Page
                     {
