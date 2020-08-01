@@ -166,28 +166,7 @@ namespace WikiWalks
         private IEnumerable<Page> pages = new List<Page>();
         public AllWorsGetter()
         {
-            try
-            {
-                hurryToSetAllPages();
-
-                Task.Run(async () =>
-                {
-                    while (true)
-                    {
-                        try
-                        {
-                            await Task.Delay(1000 * 60);
-
-                            if (DateTime.Now.Minute == 0)
-                            {
-                                await setAllPagesAsync();
-                            }
-                        }
-                        catch (Exception ex) { }
-                    }
-                });
-            }
-            catch (Exception ex) { }
+            hurryToSetAllPages();
         }
 
         public IEnumerable<Page> getPages()
@@ -241,7 +220,7 @@ from (
         }
 
 
-        private async Task setAllPagesAsync()
+        public async Task setAllPagesAsync()
         {
             DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpPage, true); //開始記録
 
@@ -279,7 +258,7 @@ from (
 
                 if (count > 4)
                 {
-                    await Task.Delay(5);
+                    await Task.Delay(50);
                     Page page = new Page
                     {
                         wordId = wordId,
@@ -298,6 +277,7 @@ from (
                     }
 
                     allPages.Add(page);
+                    await Task.Delay(50);
                 }
             }
 
@@ -324,16 +304,31 @@ from (
                 {
                     while (true)
                     {
-                        try
-                        {
-                            await Task.Delay(1000 * 60);
+                        await Task.Delay(1000 * 60);
 
-                            if (DateTime.Now.Minute == 10)
+                        if (DateTime.Now.Minute == 0)
+                        {
+                            try
                             {
                                 await setAllCategoriesAsync();
                             }
+                            catch (Exception ex)
+                            {
+                                //
+                            }
+
+                            await Task.Delay(1000 * 60 * 5);
+
+                            try
+                            {
+                                await allWorsGetter.setAllPagesAsync();
+                            }
+                            catch (Exception ex)
+                            {
+                                //
+                            }
+
                         }
-                        catch (Exception ex) { }
                     }
                 });
             }
