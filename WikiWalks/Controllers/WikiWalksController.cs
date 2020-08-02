@@ -41,11 +41,11 @@ namespace RelatedPages.Controllers
 
             var allPages = allWorsGetter.getPages();
 
-            //SQLÀs‚ğŒ¸‚ç‚·‚½‚ßAƒLƒƒƒbƒVƒ…‚ğŠm”F
+            //SQLå®Ÿè¡Œã‚’æ¸›ã‚‰ã™ãŸã‚ã€ã‚­ãƒ£ãƒƒã‚·ãƒ¥ã‚’ç¢ºèª
             var wordIds = allCategoriesGetter.getCategories().FirstOrDefault(c => c.category == category)?.wordIds;
             if (wordIds != null)
             {
-                //Šù‚ÉƒJƒeƒSƒŠ‚ªƒLƒƒƒbƒVƒ…‚³‚ê‚Ä‚¢‚éê‡
+                //æ—¢ã«ã‚«ãƒ†ã‚´ãƒªãŒã‚­ãƒ£ãƒƒã‚·ãƒ¥ã•ã‚Œã¦ã„ã‚‹å ´åˆ
                 foreach (var wordId in wordIds)
                 {
                     var page = allPages.FirstOrDefault(w => w.wordId == wordId);
@@ -58,7 +58,7 @@ namespace RelatedPages.Controllers
             }
             else
             {
-                //‚Ü‚¾ƒJƒeƒSƒŠ‚ªƒLƒƒƒbƒVƒ…‚³‚ê‚Ä‚¢‚È‚¢ê‡iƒfƒvƒƒC’¼Œãj
+                //ã¾ã ã‚«ãƒ†ã‚´ãƒªãŒã‚­ãƒ£ãƒƒã‚·ãƒ¥ã•ã‚Œã¦ã„ãªã„å ´åˆï¼ˆãƒ‡ãƒ—ãƒ­ã‚¤ç›´å¾Œï¼‰
                 string sql = "select wordId from CategoryJp where category like @category;";
 
                 var result = con.ExecuteSelect(sql, new Dictionary<string, object[]> { { "@category", new object[2] { SqlDbType.NVarChar, category } } });
