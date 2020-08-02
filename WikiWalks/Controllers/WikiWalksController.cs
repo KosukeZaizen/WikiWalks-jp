@@ -34,7 +34,7 @@ namespace RelatedPages.Controllers
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<Page> getWordsForCategory(string category)
+        public async Task<IEnumerable<Page>> getWordsForCategory(string category)
         {
             var con = new DBCon();
             var pages = new List<Page>();
@@ -43,20 +43,20 @@ namespace RelatedPages.Controllers
 
             var result = con.ExecuteSelect(sql, new Dictionary<string, object[]> { { "@category", new object[2] { SqlDbType.NVarChar, category } } });
 
-            result.ForEach((e) =>
+            await Task.WhenAll(result.Select(e => Task.Run(() =>
             {
                 var page = allWorsGetter.getPages().FirstOrDefault(w => w.wordId == (int)e["wordId"]);
                 if (page != null)
                 {
                     pages.Add(page);
                 }
-            });
+            })));
 
             return pages;
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<Page> getWordsForCategoryWithoutSnippet(string category)
+        public async Task<IEnumerable<Page>> getWordsForCategoryWithoutSnippet(string category)
         {
             var con = new DBCon();
             var pages = new List<Page>();
@@ -65,7 +65,7 @@ namespace RelatedPages.Controllers
 
             var result = con.ExecuteSelect(sql, new Dictionary<string, object[]> { { "@category", new object[2] { SqlDbType.NVarChar, category } } });
 
-            result.ForEach((e) =>
+            await Task.WhenAll(result.Select(e => Task.Run(() =>
             {
                 var page = allWorsGetter.getPages().FirstOrDefault(w => w.wordId == (int)e["wordId"]);
                 if (page != null)
@@ -78,7 +78,7 @@ namespace RelatedPages.Controllers
                         referenceCount = page.referenceCount
                     });
                 }
-            });
+            })));
 
             return pages;
         }
@@ -99,7 +99,7 @@ namespace RelatedPages.Controllers
             if (wordId <= 0) return new { };
 
             var con = new DBCon();
-            var ps = new List<Page>();
+            List<Page> ps = new List<Page>();
 
             var result = con.ExecuteSelect(@"
 select w.wordId, w.word, wr.snippet from WordJp as w
@@ -114,10 +114,12 @@ on w.wordId = wr.sourceWordId;
                 var page = allWorsGetter.getPages().FirstOrDefault(w => w.wordId == (int)e["wordId"]);
                 if (page == null)
                 {
-                    page = new Page();
-                    page.wordId = (int)e["wordId"];
-                    page.word = (string)e["word"];
-                    page.referenceCount = 0;
+                    page = new Page
+                    {
+                        wordId = (int)e["wordId"],
+                        word = (string)e["word"],
+                        referenceCount = 0
+                    };
                 }
                 page.snippet = (string)e["snippet"];
                 ps.Add(page);
