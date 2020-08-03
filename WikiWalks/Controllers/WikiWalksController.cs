@@ -43,7 +43,6 @@ namespace RelatedPages.Controllers
 
             var result = con.ExecuteSelect(sql, new Dictionary<string, object[]> { { "@category", new object[2] { SqlDbType.NVarChar, category } } });
 
-            //急ぐ処理ではないので、Thread枯渇を考慮してTask.Runは使わない。
             result.ForEach(e =>
             {
                 var page = allWorsGetter.getPages().FirstOrDefault(w => w.wordId == (int)e["wordId"]);
@@ -57,7 +56,7 @@ namespace RelatedPages.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<IEnumerable<Page>> getWordsForCategoryWithoutSnippet(string category)
+        public IEnumerable<Page> getWordsForCategoryWithoutSnippet(string category)
         {
             var con = new DBCon();
             var pages = new List<Page>();
@@ -66,7 +65,7 @@ namespace RelatedPages.Controllers
 
             var result = con.ExecuteSelect(sql, new Dictionary<string, object[]> { { "@category", new object[2] { SqlDbType.NVarChar, category } } });
 
-            await Task.WhenAll(result.Select(e => Task.Run(() =>
+            result.ForEach(e =>
             {
                 var page = allWorsGetter.getPages().FirstOrDefault(w => w.wordId == (int)e["wordId"]);
                 if (page != null)
@@ -79,7 +78,7 @@ namespace RelatedPages.Controllers
                         referenceCount = page.referenceCount
                     });
                 }
-            })));
+            });
 
             return pages;
         }
