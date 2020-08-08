@@ -167,7 +167,7 @@ namespace WikiWalks
         private IEnumerable<Page> pages = new List<Page>();
         public AllWorsGetter()
         {
-            hurryToSetAllPages();
+            Task.Run(() => hurryToSetAllPages());
         }
 
         public IEnumerable<Page> getPages()
@@ -224,6 +224,15 @@ from (
             catch (Exception ex)
             {
                 System.Threading.Thread.Sleep(1000 * 60);//DBへの負荷を考慮してSleep
+
+                //DBにエラー内容書き出し
+                var con = new DBCon();
+                con.ExecuteUpdate(
+                    "INSERT INTO Log VALUES (DATEADD(HOUR, 9, GETDATE()), @message);",
+                    new Dictionary<string, object[]> { { "@message", new object[2] {
+                        SqlDbType.NVarChar, "WikiWalksJp-hurryToSetAllPages Message: " + ex.Message + " StackTrace: " + ex.StackTrace
+                    } } }
+                );
                 hurryToSetAllPages();
             }
         }
@@ -239,7 +248,7 @@ from (
             var min = 35;// 2020-08-01確認
             var max = (int)con.ExecuteSelect("select max(wordId) as max from WordJp;").FirstOrDefault()["max"];
 
-            string sqlForCnt = "select count(*) as cnt from WordReferenceJp where targetWordId = @wordId";
+            string sqlForCnt = "select count(targetWordId) as cnt from WordReferenceJp where targetWordId = @wordId;";
             string sqlForEachWord = @"
 select
 wr1.word,
@@ -257,7 +266,16 @@ from (
             await Task.Delay(1000 * 10);
             for (var wordId = min; wordId <= max; wordId++)
             {
-                await Task.Delay(3);
+                if (wordId - min < 1000)
+                {
+                    //前半に大きな負荷がかかっているように見受けられるため、前半の待機を長めに
+                    var d = wordId - min;
+                    await Task.Delay(1003 - d);
+                }
+                else
+                {
+                    await Task.Delay(3);
+                }
 
                 var count = (int)con.ExecuteSelect(
                         sqlForCnt,
@@ -306,10 +324,12 @@ from (
             {
                 this.allWorsGetter = allWorsGetter;
 
-                hurryToSetAllCategories();
+                Task.Run(() => hurryToSetAllCategories());
 
                 Task.Run(async () =>
                 {
+                    await Task.Delay(1000 * 60 * 30);
+
                     while (true)
                     {
                         await Task.Delay(1000 * 60);
@@ -381,6 +401,15 @@ group by category
             catch (Exception ex)
             {
                 System.Threading.Thread.Sleep(1000 * 60);//DBへの負荷を考慮してSleep
+
+                //DBにエラー内容書き出し
+                var con = new DBCon();
+                con.ExecuteUpdate(
+                    "INSERT INTO Log VALUES (DATEADD(HOUR, 9, GETDATE()), @message);",
+                    new Dictionary<string, object[]> { { "@message", new object[2] {
+                        SqlDbType.NVarChar, "WikiWalksJp-hurryToSetAllCategories Message: " + ex.Message + " StackTrace: " + ex.StackTrace
+                    } } }
+                );
                 hurryToSetAllCategories();
             }
         }
