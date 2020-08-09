@@ -266,11 +266,11 @@ from (
             await Task.Delay(1000 * 10);
             for (var wordId = min; wordId <= max; wordId++)
             {
-                if (wordId - min < 1000)
+                var d = wordId - min;
+                if (d < 1000)
                 {
                     //前半に大きな負荷がかかっているように見受けられるため、前半の待機を長めに
-                    var d = wordId - min;
-                    await Task.Delay(1003 - d);
+                    await Task.Delay(2003 - (d * 2));
                 }
                 else
                 {
