@@ -27,6 +27,41 @@ namespace RelatedPages.Controllers
         }
 
         [HttpGet("[action]")]
+        public bool CheckIfTheWordIsIncluded(string word)
+        {
+            //Z-Apps専用API
+            return allWorsGetter.getPages().Any(p => p.word == word);
+        }
+
+        [HttpGet("[action]")]
+        public IEnumerable<string> GetAllWords()
+        {
+            //Z-Apps専用API
+            return allWorsGetter.getPages()
+                .Select(p => p.word)
+                .Where(s => System.Text.RegularExpressions.Regex.IsMatch(s,
+                @"[\p{IsCJKUnifiedIdeographs}" +
+                @"\p{IsCJKCompatibilityIdeographs}" +
+                @"\p{IsCJKUnifiedIdeographsExtensionA}]|" +
+                @"[\uD840-\uD869][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]") && !s.Contains("+"));
+        }
+
+        [HttpGet("[action]")]
+        public IEnumerable<string> GetPartialKanjiWords(int num)
+        {
+            //Z-Apps専用API
+            return allWorsGetter.getPages()
+                .Take(num * 2)
+                .Select(p => p.word)
+                .Where(s => System.Text.RegularExpressions.Regex.IsMatch(s,
+                @"[\p{IsCJKUnifiedIdeographs}" +
+                @"\p{IsCJKCompatibilityIdeographs}" +
+                @"\p{IsCJKUnifiedIdeographsExtensionA}]|" +
+                @"[\uD840-\uD869][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]") && !s.Contains("+"))
+                .Take(num);
+        }
+
+        [HttpGet("[action]")]
         public IEnumerable<object> getPartialCategories(int num)
         {
             return allCategoriesGetter.getCategories().Take(num);
