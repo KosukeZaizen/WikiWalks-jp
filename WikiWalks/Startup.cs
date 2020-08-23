@@ -340,7 +340,10 @@ from (
 
             //前回と同じwordIdのページのみ更新（この時点では新規追加なし）
             pages = allPages
-                .Where(p => pages.Any(oldPage => oldPage.wordId == p.wordId))
+                .Where(p =>
+                    pages.Any(oldPage => oldPage.wordId == p.wordId) || 
+                    newPages.Any(oldPage => oldPage.wordId == p.wordId)
+                )
                 .OrderByDescending(p => p.referenceCount)
                 .ToList();
 
