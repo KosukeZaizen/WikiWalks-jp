@@ -181,8 +181,7 @@ namespace WikiWalks
         public void decreaseNewPageNumbers()
         {
             Random random = new Random();
-            int min = randomLimit < 1 ? 0 : 1;
-            for (int i = 0; i < random.Next(min, randomLimit); i++)
+            for (int i = 0; i < random.Next(1, randomLimit); i++)
             {
                 if (newPageNumbers.Count() > 0)
                 {
@@ -326,11 +325,15 @@ from (
             int remainingNewPagesCount = newPageNumbers.Count();
             if (remainingNewPagesCount <= 0)
             {
-                randomLimit--;
+                if (randomLimit > 1) {
+                    randomLimit--;
+                }
             }
             else
             {
-                randomLimit++;
+                if (randomLimit < 5) {
+                    randomLimit++;
+                }
             }
 
             //新たに追加されているページのwordIdを格納
