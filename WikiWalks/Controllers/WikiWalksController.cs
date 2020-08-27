@@ -43,7 +43,8 @@ namespace RelatedPages.Controllers
                 @"[\p{IsCJKUnifiedIdeographs}" +
                 @"\p{IsCJKCompatibilityIdeographs}" +
                 @"\p{IsCJKUnifiedIdeographsExtensionA}]|" +
-                @"[\uD840-\uD869][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]"));
+                @"[\uD840-\uD869][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]")
+                && !s.Contains("?") && !s.Contains("&"));
         }
 
         [HttpGet("[action]")]
@@ -57,7 +58,8 @@ namespace RelatedPages.Controllers
                 @"[\p{IsCJKUnifiedIdeographs}" +
                 @"\p{IsCJKCompatibilityIdeographs}" +
                 @"\p{IsCJKUnifiedIdeographsExtensionA}]|" +
-                @"[\uD840-\uD869][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]"))
+                @"[\uD840-\uD869][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]")
+                && !s.Contains("?") && !s.Contains("&"))
                 .Take(num);
         }
 
