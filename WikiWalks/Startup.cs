@@ -14,6 +14,7 @@ using System.Text;
 using System.Web;
 using System;
 using System.Data;
+using System.Net.Http;
 
 namespace WikiWalks
 {
@@ -40,17 +41,15 @@ namespace WikiWalks
             //一旦ロックを解除
             //DB_Util.releaseLock();
 
-            var allWorsGetter = new AllWorsGetter();
+            var allWorsGetter = new AllWordsGetter();
             services.AddSingleton(allWorsGetter);
-
-            System.Threading.Thread.Sleep(1000 * 10);//DBへの負荷を考慮してSleep
 
             var allCategoriesGetter = new AllCategoriesGetter(allWorsGetter);
             services.AddSingleton(allCategoriesGetter);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, AllWorsGetter allWorsGetter, AllCategoriesGetter allCategoriesGetter)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, AllWordsGetter allWorsGetter, AllCategoriesGetter allCategoriesGetter)
         {
             if (env.IsDevelopment())
             {
@@ -163,15 +162,11 @@ namespace WikiWalks
         }
     }
 
-    public class AllWorsGetter
+    public class AllWordsGetter
     {
         private List<Page> pages = new List<Page>();
         private List<Page> newPages = new List<Page>();
         private int randomLimit = 5;
-        public AllWorsGetter()
-        {
-            Task.Run(() => hurryToSetAllPages());
-        }
 
         public IEnumerable<Page> getPages()
         {
@@ -192,7 +187,7 @@ namespace WikiWalks
             pages = pages.OrderByDescending(p => p.referenceCount).ToList();
         }
 
-        private void hurryToSetAllPages()
+        public void hurryToSetAllPages()
         {
             try
             {
@@ -360,15 +355,20 @@ from (
     public class AllCategoriesGetter
     {
         private IEnumerable<Category> categories = new List<Category>();
-        private AllWorsGetter allWorsGetter;
+        private AllWordsGetter allWordsGetter;
 
-        public AllCategoriesGetter(AllWorsGetter allWorsGetter)
+        public AllCategoriesGetter(AllWordsGetter allWordsGetter)
         {
             try
             {
-                this.allWorsGetter = allWorsGetter;
+                this.allWordsGetter = allWordsGetter;
 
-                Task.Run(() => hurryToSetAllCategories());
+                Task.Run(() =>
+                {
+                    allWordsGetter.hurryToSetAllPages();
+                    System.Threading.Thread.Sleep(1000 * 5);//DBへの負荷を考慮して5秒Sleep
+                    hurryToSetAllCategories();
+                });
 
                 Task.Run(async () =>
                 {
@@ -382,7 +382,7 @@ from (
                         {
                             try
                             {
-                                await allWorsGetter.setAllPagesAsync();
+                                await allWordsGetter.setAllPagesAsync();
                             }
                             catch (Exception ex)
                             {
@@ -400,11 +400,29 @@ from (
                                 //
                             }
 
+                            try
+                            {
+                                //バッチが動いてなければ起動
+                                StartBatch();
+                            }
+                            catch (Exception ex)
+                            {
+                                //
+                            }
                         }
                     }
                 });
             }
             catch (Exception ex) { }
+        }
+
+        private async void StartBatch()
+        {
+            using (var client = new HttpClient())
+            {
+                HttpResponseMessage response = await client.GetAsync(@"https://wiki-bat-jp.azurewebsites.net/");
+                string msg = await response.Content.ReadAsStringAsync();
+            }
         }
 
         public IEnumerable<Category> getCategories()
@@ -466,7 +484,7 @@ group by category
             var con = new DBCon();
             var l = new List<Category>();
 
-            var pages = allWorsGetter.getPages().ToList();
+            var pages = allWordsGetter.getPages().ToList();
 
             var hashCategories = new HashSet<string>();
             foreach (var page in pages)
