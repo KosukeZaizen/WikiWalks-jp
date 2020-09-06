@@ -27,10 +27,10 @@ namespace RelatedPages.Controllers
         }
 
         [HttpGet("[action]")]
-        public bool CheckIfTheWordIsIncluded(string word)
+        public int? GetWordId(string word)
         {
             //Z-Apps専用API
-            return allWorsGetter.getPages().Any(p => p.word == word);
+            return allWorsGetter.getPages().FirstOrDefault(p => p.word == word)?.wordId;
         }
 
         [HttpGet("[action]")]
