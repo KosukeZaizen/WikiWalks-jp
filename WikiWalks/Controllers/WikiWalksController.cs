@@ -34,6 +34,19 @@ namespace RelatedPages.Controllers
         }
 
         [HttpGet("[action]")]
+        public object GetWordIdAndSnippet(string word)
+        {
+            //Z-Apps専用API
+            var w = allWorsGetter.getPages().FirstOrDefault(p => p.word == word);
+
+            return new
+            {
+                w?.wordId,
+                w?.snippet
+            };
+        }
+
+        [HttpGet("[action]")]
         public IEnumerable<string> GetAllWords()
         {
             //Z-Apps専用API
