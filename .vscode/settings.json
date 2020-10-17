@@ -1,5 +1,10 @@
 {
     "appService.preDeployTask": "publish-release",
     "appService.deploySubpath": "WikiWalks\\bin\\Release\\netcoreapp2.2\\publish",
-    "appService.defaultWebAppToDeploy": "/subscriptions/847fd013-d3ed-4a13-b7a7-342cc2291e1b/resourceGroups/NetworkWatcherRG/providers/Microsoft.Web/sites/WikiWalks-jp"
+    "appService.defaultWebAppToDeploy": "/subscriptions/847fd013-d3ed-4a13-b7a7-342cc2291e1b/resourceGroups/NetworkWatcherRG/providers/Microsoft.Web/sites/WikiWalks-jp",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true,
+        "source.fixAll.eslint": true
+    }
 }
