@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
 using Microsoft.AspNetCore.Mvc;
@@ -5,7 +6,8 @@ using RelatedPages.Models;
 using System.Linq;
 using WikiWalks;
 using System.Threading.Tasks;
-using System;
+using System.Text.Json;
+
 
 namespace RelatedPages.Controllers
 {
@@ -14,17 +16,11 @@ namespace RelatedPages.Controllers
     {
         private readonly AllWordsGetter allWorsGetter;
         private readonly AllCategoriesGetter allCategoriesGetter;
-        private static Dictionary<int, object> relatedArticlesCache;
 
         public WikiWalksController(AllWordsGetter allWorsGetter, AllCategoriesGetter allCategoriesGetter)
         {
             this.allWorsGetter = allWorsGetter;
             this.allCategoriesGetter = allCategoriesGetter;
-        }
-
-        static WikiWalksController()
-        {
-            relatedArticlesCache = new Dictionary<int, object>();
         }
 
         [HttpGet("[action]")]
@@ -153,15 +149,20 @@ namespace RelatedPages.Controllers
             return new { word = (string)result.FirstOrDefault()["word"] };
         }
 
-        [HttpGet("[action]")]
-        public object getRelatedArticles(int wordId)
+        public class RelatedArticlesResponse
         {
-            if (wordId <= 0) return new { };
+            public IEnumerable<Page> pages;
+        }
+        [HttpGet("[action]")]
+        public string getRelatedArticles(int wordId)
+        {
+            if (wordId <= 0) return "{}";
 
-            Action getRelatedArticlesWithoutCache = () =>
+            var con = new DBCon();
+
+            Func<string> getRelatedArticlesWithoutCache = () =>
             {
-                var con = new DBCon();
-                List<Page> ps = new List<Page>();
+                var ps = new List<Page>();
 
                 var result = con.ExecuteSelect(@"
 select w.wordId, w.word, wr.snippet from WordJp as w
@@ -176,35 +177,80 @@ on w.wordId = wr.sourceWordId;
                     var page = allWorsGetter.getPages().FirstOrDefault(w => w.wordId == (int)e["wordId"]);
                     if (page == null)
                     {
-                        page = new Page
-                        {
-                            wordId = (int)e["wordId"],
-                            word = (string)e["word"],
-                            referenceCount = 0
-                        };
+                        page = new Page();
+                        page.wordId = (int)e["wordId"];
+                        page.word = (string)e["word"];
+                        page.referenceCount = 0;
                     }
                     page.snippet = (string)e["snippet"];
                     ps.Add(page);
                 });
 
-                var pages = ps.OrderByDescending(p => p.referenceCount).ToList();
-
-                relatedArticlesCache[wordId] = new { pages };
+                if (ps.Any(p => p.referenceCount > 0))
+                {
+                    var pages = ps.OrderByDescending(p => p.referenceCount).ToList();
+                    return JsonSerializer.Serialize(new { pages });
+                }
+                else
+                {
+                    //デプロイ直後でまだallWorsGetterの準備ができていない場合は、
+                    //キャッシュテーブルに登録しない
+                    return "{}";
+                }
             };
 
-            if (relatedArticlesCache.ContainsKey(wordId))
+
+            //キャッシュ取得
+            var cache = con.ExecuteSelect(@"
+select wordId, response
+from RelatedArticlesCacheJp
+where wordId = @wordId
+", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
+
+            if (cache.Count() > 0)
             {
+                //キャッシュデータあり
+
                 Task.Run(async () =>
                 {
-                    await Task.Delay(5000);
-                    getRelatedArticlesWithoutCache();
+                    //10秒待って再取得・更新
+                    await Task.Delay(10 * 1000);
+                    string json = getRelatedArticlesWithoutCache();
+                    if (json.Contains("pages"))
+                    {
+                        con.ExecuteUpdate(@"
+update RelatedArticlesCacheJp
+set response = @json,
+    lastMod = DATEADD(hour, 9, SYSDATETIME())
+where wordId = @wordId
+", new Dictionary<string, object[]> {
+                            { "@json", new object[2] { SqlDbType.NVarChar, json } },
+                            { "@wordId", new object[2] { SqlDbType.Int, wordId } }
+                        });
+                    }
                 });
-                return relatedArticlesCache[wordId];
+
+                //上記完了を待たずに、キャッシュされていたデータを返す
+                return (string)cache.FirstOrDefault()["response"];
             }
             else
             {
-                getRelatedArticlesWithoutCache();
-                return relatedArticlesCache[wordId];
+                //キャッシュデータなし
+                string json = getRelatedArticlesWithoutCache();
+                //キャッシュデータあり
+                Task.Run(async () =>
+                {
+                    //2秒待って登録
+                    await Task.Delay(2 * 1000);
+                    if (json.Contains("pages"))
+                    {
+                        con.ExecuteUpdate("insert into RelatedArticlesCacheJp values(@wordId, @json, DATEADD(hour, 9, SYSDATETIME()));", new Dictionary<string, object[]> {
+                            { "@json", new object[2] { SqlDbType.NVarChar, json } },
+                            { "@wordId", new object[2] { SqlDbType.Int, wordId } }
+                        });
+                    }
+                });
+                return json;
             }
         }
 
