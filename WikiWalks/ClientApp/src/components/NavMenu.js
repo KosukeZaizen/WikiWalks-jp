@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { Button, Container, Navbar, NavbarBrand } from "reactstrap";
+import { Container, Navbar, NavbarBrand } from "reactstrap";
 import "./NavMenu.css";
 
 export default function NavMenu() {
@@ -18,15 +18,6 @@ export default function NavMenu() {
                     >
                         うぃき忍者
                     </NavbarBrand>
-                    <Button
-                        color="primary"
-                        style={{ fontWeight: "bold" }}
-                        href="https://wiki.lingual-ninja.com"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        English
-                    </Button>
                 </Container>
             </Navbar>
         </header>
