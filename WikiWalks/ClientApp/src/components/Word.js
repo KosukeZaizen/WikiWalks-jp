@@ -172,13 +172,13 @@ class PagesForTheTitles extends Component {
                     <br />
                     {lineChangeDesc}
                     <span id="indexOfVocabLists"></span>
-                    <div style={isWide ? { display: "flex" } : {}}>
+                    <div style={isWide ? { display: "flex", marginBottom: 20 } : {}}>
                         {categories && categories.length > 0 && (
                             <div
                                 style={{
                                     maxWidth: 500,
                                     padding: 10,
-                                    marginBottom: isWide ? 20 : 30,
+                                    marginBottom: isWide ? "auto" : 30,
                                     marginRight: isWide ? 20 : 0,
                                     border: "5px double gray",
                                     width: "100%",
