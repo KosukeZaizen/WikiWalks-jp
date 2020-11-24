@@ -59,6 +59,7 @@ namespace RelatedPages.Controllers
                 && !s.Contains(",")
                 && !s.Contains("[")
                 && !s.Contains("]")
+                && !s.Contains("+")
                 );
         }
 
