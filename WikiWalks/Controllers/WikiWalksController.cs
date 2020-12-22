@@ -33,7 +33,7 @@ namespace RelatedPages.Controllers
         public object GetWordIdAndSnippet(string word)
         {
             //Z-Apps専用API
-            var w = allWorsGetter.getPages().FirstOrDefault(p => p.word == word);
+            var w = allWorsGetter.getPages().FirstOrDefault(p => p.word == word && CheckValidZAppsWord(word));
 
             return new
             {
@@ -48,19 +48,7 @@ namespace RelatedPages.Controllers
             //Z-Apps専用API
             return allWorsGetter.getPages()
                 .Select(p => p.word)
-                .Where(s => System.Text.RegularExpressions.Regex.IsMatch(s,
-                @"[\p{IsCJKUnifiedIdeographs}" +
-                @"\p{IsCJKCompatibilityIdeographs}" +
-                @"\p{IsCJKUnifiedIdeographsExtensionA}]|" +
-                @"[\uD840-\uD869][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]")
-                && !s.Contains("?")
-                && !s.Contains("&")
-                && !s.Contains("–")
-                && !s.Contains(",")
-                && !s.Contains("[")
-                && !s.Contains("]")
-                && !s.Contains("+")
-                );
+                .Where(s => CheckValidZAppsWord(s));
         }
 
         [HttpGet("[action]")]
@@ -70,18 +58,53 @@ namespace RelatedPages.Controllers
             return allWorsGetter.getPages()
                 .Take(num * 2)
                 .Select(p => p.word)
-                .Where(s => System.Text.RegularExpressions.Regex.IsMatch(s,
+                .Where(s => CheckValidZAppsWord(s))
+                .Take(num);
+        }
+
+        [HttpGet("[action]")]
+        public IEnumerable<string> GetRandomKanjiWords(int num)
+        {
+            //Z-Apps専用API
+            return Shuffle(allWorsGetter.getPages())
+                .Take(num * 5)
+                .Select(p => p.word)
+                .Where(s => CheckValidZAppsWord(s))
+                .Take(num);
+        }
+
+        private IEnumerable<T> Shuffle<T>(IEnumerable<T> list)
+        {
+            var tempList = new List<T>(list); // 入力をリストにコピーする
+
+            var r = new Random(); // 値を取り出すときに乱数を使用する
+
+            while (tempList.Count() != 0)
+            {
+                int index = r.Next(0, tempList.Count);
+
+                T value = tempList[index];
+                tempList.RemoveAt(index);
+
+                yield return value;
+            }
+        }
+
+        public bool CheckValidZAppsWord(string targetWord)
+        {
+            //Z-Apps専用API
+            return (System.Text.RegularExpressions.Regex.IsMatch(targetWord,
                 @"[\p{IsCJKUnifiedIdeographs}" +
                 @"\p{IsCJKCompatibilityIdeographs}" +
                 @"\p{IsCJKUnifiedIdeographsExtensionA}]|" +
                 @"[\uD840-\uD869][\uDC00-\uDFFF]|\uD869[\uDC00-\uDEDF]")
-                && !s.Contains("?")
-                && !s.Contains("&")
-                && !s.Contains("–")
-                && !s.Contains(",")
-                && !s.Contains("[")
-                && !s.Contains("]")
-                ).Take(num);
+                && !targetWord.Contains("?")
+                && !targetWord.Contains("&")
+                && !targetWord.Contains("–")
+                && !targetWord.Contains(",")
+                && !targetWord.Contains("[")
+                && !targetWord.Contains("]")
+                && !targetWord.Contains("+"));
         }
 
         [HttpGet("[action]")]
