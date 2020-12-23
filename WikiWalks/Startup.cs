@@ -16,6 +16,8 @@ using System;
 using System.Data;
 using System.Net.Http;
 using Newtonsoft.Json;
+using Z_Apps.Models.SystemBase;
+using System.Text.RegularExpressions;
 
 namespace WikiWalks
 {
@@ -75,41 +77,15 @@ namespace WikiWalks
                 string url = context.Request.Path.Value;
                 if (url.EndsWith("sitemap.xml"))
                 {
-                    var domain = "https://wiki-jp.lingual-ninja.com";
-                    var lstSitemap = new List<Dictionary<string, string>>();
-
-                    //top page
-                    var dic1 = new Dictionary<string, string>();
-                    dic1["loc"] = domain;
-                    lstSitemap.Add(dic1);
-
-                    //all keywords page
-                    var dicAll = new Dictionary<string, string>();
-                    dicAll["loc"] = domain + "/all";
-                    lstSitemap.Add(dicAll);
-
-                    //category page
-                    //カテゴリページはnoindexとし、除外
-                    //IEnumerable<string> allCategories = allCategoriesGetter.getCategories().Select(c => c.category);
-                    //foreach (var category in allCategories)
-                    //{
-                    //    var dic2 = new Dictionary<string, string>();
-                    //    dic2["loc"] = domain + "/category/" + HttpUtility.UrlEncode(category.Replace(" ", "_")).Replace("%27", "'");
-                    //    lstSitemap.Add(dic2);
-                    //}
-
-                    //word page
-                    allWorsGetter.addNewPages();
-                    IEnumerable<int> allWordId = allWorsGetter.getPages().Select(p => p.wordId);
-                    foreach (var wordId in allWordId)
-                    {
-                        var dicWordId = new Dictionary<string, string>();
-                        dicWordId["loc"] = domain + "/word/" + HttpUtility.UrlEncode(wordId.ToString());
-                        lstSitemap.Add(dicWordId);
-                    }
-
-                    string resultXML = RegisterSitemap(lstSitemap);
-
+                    var siteMapService = new SiteMapService(allWorsGetter, allCategoriesGetter);
+                    string resultXML = siteMapService.GetSiteMapText(false, 0);
+                    await context.Response.WriteAsync(resultXML);
+                }
+                else if (Regex.IsMatch(url, "sitemap[1-9][0-9]*.xml"))
+                {
+                    var siteMapService = new SiteMapService(allWorsGetter, allCategoriesGetter);
+                    int number = Int32.Parse(Regex.Replace(url, @"[^0-9]", ""));
+                    string resultXML = siteMapService.GetSiteMapText(false, number);
                     await context.Response.WriteAsync(resultXML);
                 }
                 else
