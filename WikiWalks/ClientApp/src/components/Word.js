@@ -248,7 +248,7 @@ class PagesForTheTitles extends Component {
                                 c={c}
                                 wordId={wordId}
                                 sectionStyle={this.sectionStyle}
-                                pagesLoaded={pages && pages.length > 0}
+                                pagesLoaded={pages && pages.length > 1}
                             />
                         ))}
                     {categories && categories.length > 0 && (
