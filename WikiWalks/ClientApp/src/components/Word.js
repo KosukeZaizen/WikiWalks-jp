@@ -297,8 +297,8 @@ function renderTable(pages, wordId, word) {
                     return 0;
                 }
             })
-            .map((page, i) => (
-                <tr key={i}>
+            .map((page) => (
+                <tr key={page.wordId}>
                     <td style={{ fontWeight: "bold", minWidth: 100 }}>
                         {page.wordId !== wordId && page.referenceCount > 4 ? (
                             <Link to={"/word/" + page.wordId}>{page.word}</Link>
