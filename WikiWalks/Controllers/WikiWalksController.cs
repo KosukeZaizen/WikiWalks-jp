@@ -192,10 +192,7 @@ namespace RelatedPages.Controllers
             return new { word = (string)result.FirstOrDefault()["word"] };
         }
 
-        public class RelatedArticlesResponse
-        {
-            public IEnumerable<Page> pages;
-        }
+
         [HttpGet("[action]")]
         public string getRelatedArticles(int wordId)
         {
@@ -339,6 +336,7 @@ on w.wordId = wr.sourceWordId;
 
             return page;
         }
+
 
         [HttpGet("[action]")]
         public object getRelatedCategories(int wordId)
