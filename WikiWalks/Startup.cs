@@ -18,6 +18,7 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using Z_Apps.Models.SystemBase;
 using System.Text.RegularExpressions;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace WikiWalks
 {
@@ -41,8 +42,11 @@ namespace WikiWalks
                 configuration.RootPath = "ClientApp/build";
             });
 
-            //一旦ロックを解除
-            //DB_Util.releaseLock();
+            services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+                options.Providers.Add<GzipCompressionProvider>();
+            });
 
             var allWorsGetter = new AllWordsGetter();
             services.AddSingleton(allWorsGetter);
@@ -93,6 +97,8 @@ namespace WikiWalks
                     await next.Invoke();
                 }
             });
+
+            app.UseResponseCompression();
 
             app.UseMvc(routes =>
             {

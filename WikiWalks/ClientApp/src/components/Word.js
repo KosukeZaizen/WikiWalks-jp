@@ -72,7 +72,8 @@ class PagesForTheTitles extends Component {
         const { pages, categories } = this.props;
         const word = this.props.word || "Loading...";
         const cat =
-            categories && categories.sort((c1, c2) => c2.cnt - c1.cnt)[0];
+            categories &&
+            categories.sort((c1, c2) => c1.cnt - c2.cnt)[categories.length - 1];
         const category = cat && cat.category;
         const categoryForUrl =
             category && encodeURIComponent(category.split(" ").join("_"));
@@ -242,9 +243,9 @@ class PagesForTheTitles extends Component {
                     {showAd && <GoogleAd />}
                     {categories &&
                         categories.length > 0 &&
-                        categories.map((c, i) => (
+                        categories.map(c => (
                             <RenderOtherTable
-                                key={i}
+                                key={c.category}
                                 c={c}
                                 wordId={wordId}
                                 sectionStyle={this.sectionStyle}
@@ -297,7 +298,7 @@ function renderTable(pages, wordId, word) {
                     return 0;
                 }
             })
-            .map((page) => (
+            .map(page => (
                 <tr key={page.wordId}>
                     <td style={{ fontWeight: "bold", minWidth: 100 }}>
                         {page.wordId !== wordId && page.referenceCount > 4 ? (

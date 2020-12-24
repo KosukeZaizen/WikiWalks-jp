@@ -121,16 +121,17 @@ namespace RelatedPages.Controllers
 
             string sql = "select wordId from CategoryJp where category like @category;";
 
-            var result = con.ExecuteSelect(sql, new Dictionary<string, object[]> { { "@category", new object[2] { SqlDbType.NVarChar, category } } });
+            var result = con.ExecuteSelect(sql, new Dictionary<string, object[]> { { "@category", new object[2] { SqlDbType.NVarChar, category } } })
+                            .Take(100);
 
-            result.ForEach(e =>
+            foreach (var e in result)
             {
                 var page = allWorsGetter.getPages().FirstOrDefault(w => w.wordId == (int)e["wordId"]);
                 if (page != null)
                 {
                     pages.Add(page);
                 }
-            });
+            }
 
             return pages;
         }

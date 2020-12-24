@@ -61,8 +61,8 @@ export const actionCreators = {
                             pages: [...pages, ...ps],
                         });
                     }
-                } catch (e) { }
-            }
+                } catch (e) {}
+            };
             void get50Other();
 
             const url = `api/WikiWalks/getRelatedArticles?wordId=${wordId}`;
