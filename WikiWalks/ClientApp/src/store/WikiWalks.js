@@ -11,8 +11,9 @@ export const actionCreators = {
             const response = await fetch(url);
             const { word } = await response.json();
 
-            if (!word)
+            if (!word){
                 window.location.href = `/not-found?p=${window.location.pathname}`;
+            }
 
             dispatch({ type: receiveWordType, word });
         } catch (e) {
@@ -48,12 +49,13 @@ export const actionCreators = {
                 } catch (e) {}
             };
             const get50Other = async () => {
-                await getOwnArticle();
+                const promiseOwn = getOwnArticle();
                 try {
                     const url = `api/WikiWalks/get50ArticlesExceptOwn?wordId=${wordId}`;
                     const response = await fetch(url);
                     const ps = await response.json();
 
+                    await promiseOwn;
                     const { pages } = getState().wikiWalks;
                     if (pages.length < 2) {
                         dispatch({
@@ -69,8 +71,9 @@ export const actionCreators = {
             const response = await fetch(url);
             const { pages } = await response.json();
 
-            if (!pages || pages.length < 5)
+            if (!pages || pages.length < 5){
                 window.location.href = `/not-found?p=${window.location.pathname}`;
+            }
 
             dispatch({ type: receivePagesType, pages });
         } catch (e) {
