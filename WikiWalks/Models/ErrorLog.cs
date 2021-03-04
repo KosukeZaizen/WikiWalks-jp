@@ -22,7 +22,6 @@ namespace RelatedPages.Models
                 var con = new DBCon();
 
                 con.ExecuteUpdate(@"
-SET ANSI_WARNINGS OFF;
 insert into WikiJpErrorLog 
 values (DATEADD(HOUR, 9, GETDATE()), @error);
 ;",

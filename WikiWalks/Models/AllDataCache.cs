@@ -40,7 +40,8 @@ where cacheKey = @key
                     new Dictionary<string, object[]> {
                             { "@json", new object[2] { SqlDbType.NVarChar, json } },
                             { "@key", new object[2] { SqlDbType.NVarChar, GetKeyString(key) } }
-                    });
+                    },
+                    60 * 60 * 6);// タイムアウト６時間
             }
             catch (Exception ex)
             {
@@ -58,7 +59,8 @@ select cacheData
 from AllDataCache 
 where cacheKey = N'WikiJpCategory'
 ;"
-                , null)
+                , null,
+                60 * 60 * 6)// タイムアウト６時間
                 .FirstOrDefault();
 
                 if (result != null) {
@@ -83,7 +85,8 @@ select cacheData
 from AllDataCache 
 where cacheKey = N'WikiJpPages'
 ;"
-                , null)
+                , null,
+                60 * 60 * 6)// タイムアウト６時間
                 .FirstOrDefault();
 
                 if (result != null) {

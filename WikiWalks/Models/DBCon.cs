@@ -8,7 +8,11 @@ namespace RelatedPages.Models
 {
     public class DBCon
     {
-        public List<Dictionary<string, Object>> ExecuteSelect(string sql, Dictionary<string, object[]> dicParams = null, int timeout = 60 * 60 * 2)
+        public List<Dictionary<string, Object>> ExecuteSelect(
+            string sql, 
+            Dictionary<string, object[]> dicParams = null, 
+            int timeout = 60 * 60 * 2
+            )
         {
             using (var connection = new SqlConnection(PrivateConsts.CONNECTION_STRING))
             using (var command = new SqlCommand(sql, connection))
@@ -65,11 +69,19 @@ namespace RelatedPages.Models
             }
         }
 
-        public bool ExecuteUpdate(string sql, Dictionary<string, object[]> dicParams = null)
+        public bool ExecuteUpdate(
+            string sql,
+            Dictionary<string, object[]> dicParams = null,
+            int timeout = 0
+            )
         {
             using (var connection = new SqlConnection(PrivateConsts.CONNECTION_STRING))
             using (var command = new SqlCommand("SET ANSI_WARNINGS OFF; " + sql, connection))
             {
+                if (timeout != 0) {
+                    //参考：https://netsystem.jpn.org/t_nary/vb-net/sql-server-%E3%82%BF%E3%82%A4%E3%83%A0%E3%82%A2%E3%82%A6%E3%83%88%E9%96%A2%E9%80%A3%E3%81%AE%E8%A8%AD%E5%AE%9A/
+                    command.CommandTimeout = timeout; //コマンド実行タイムアウト
+                }
                 try
                 {
                     // パラーメータの置換
