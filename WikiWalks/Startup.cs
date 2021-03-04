@@ -11,11 +11,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Text;
-using System.Web;
 using System;
 using System.Data;
 using System.Net.Http;
-using Newtonsoft.Json;
 using Z_Apps.Models.SystemBase;
 using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -68,15 +66,20 @@ namespace WikiWalks {
 
             app.Use(async (context, next) => {
                 string url = context.Request.Path.Value;
+
                 if (url.EndsWith("sitemap.xml")) {
+
                     var siteMapService = new SiteMapService(allWorsGetter, allCategoriesGetter);
                     string resultXML = siteMapService.GetSiteMapText(false, 0);
                     await context.Response.WriteAsync(resultXML);
+
                 } else if (Regex.IsMatch(url, "sitemap[1-9][0-9]*.xml")) {
+
                     var siteMapService = new SiteMapService(allWorsGetter, allCategoriesGetter);
                     int number = int.Parse(Regex.Replace(url, @"[^0-9]", ""));
                     string resultXML = siteMapService.GetSiteMapText(false, number);
                     await context.Response.WriteAsync(resultXML);
+
                 } else {
                     await next.Invoke();
                 }
@@ -201,24 +204,9 @@ from (
                 System.Threading.Thread.Sleep(1000 * 60);//DBへの負荷を考慮してSleep
 
                 //DBにエラー内容書き出し
-                var con = new DBCon();
-                con.ExecuteUpdate(
-                    "INSERT INTO Log VALUES (DATEADD(HOUR, 9, GETDATE()), @message);",
-                    new Dictionary<string, object[]> { { "@message", new object[2] {
-                        SqlDbType.NVarChar, "WikiWalksJp-hurryToSetAllPages Message: " + ex.Message + " StackTrace: " + ex.StackTrace
-                    } } }
-                );
+                ErrorLog.InsertErrorLog(ex.Message);
                 hurryToSetAllPages();
             }
-        }
-
-        public void setPagesForDebug() {
-            Task.Run(() => {
-                var cachedPage = AllDataCache.GetCachePage();
-                if (cachedPage != null) {
-                    pages = cachedPage;
-                }
-            });
         }
 
 
@@ -323,19 +311,18 @@ from (
             try {
                 this.allWordsGetter = allWordsGetter;
 
-#if DEBUG
-                //デバッグ時
-                allWordsGetter.setPagesForDebug();
-                System.Threading.Thread.Sleep(1000 * 5);//5秒Sleep
-                setCategoriesForDebug();
-#else
-                //本番時
                 Task.Run(() =>
                 {
                     allWordsGetter.hurryToSetAllPages();
                     System.Threading.Thread.Sleep(1000 * 5);//DBへの負荷を考慮して5秒Sleep
                     hurryToSetAllCategories();
                 });
+
+                #if DEBUG
+                    //デバッグ時は以下の処理を起動しない
+                    return;
+                #endif
+
 
                 Task.Run(async () =>
                 {
@@ -353,7 +340,7 @@ from (
                             }
                             catch (Exception ex)
                             {
-                                //
+                                ErrorLog.InsertErrorLog("allWordsGetter.setAllPagesAsync(); " + ex.Message);
                             }
 
                             await Task.Delay(1000 * 60 * 5);
@@ -364,7 +351,7 @@ from (
                             }
                             catch (Exception ex)
                             {
-                                //
+                                ErrorLog.InsertErrorLog("setAllCategoriesAsync(); " + ex.Message);
                             }
 
                             try
@@ -374,13 +361,15 @@ from (
                             }
                             catch (Exception ex)
                             {
-                                //
+                                ErrorLog.InsertErrorLog("バッチが動いてなければ起動 " + ex.Message);
                             }
                         }
                     }
                 });
-#endif
-            } catch (Exception ex) { }
+            }
+            catch (Exception ex) {
+                ErrorLog.InsertErrorLog(ex.Message);
+            }
         }
 
         private async void StartBatch() {
@@ -435,13 +424,7 @@ group by category
                 System.Threading.Thread.Sleep(1000 * 60);//DBへの負荷を考慮してSleep
 
                 //DBにエラー内容書き出し
-                var con = new DBCon();
-                con.ExecuteUpdate(
-                    "INSERT INTO Log VALUES (DATEADD(HOUR, 9, GETDATE()), @message);",
-                    new Dictionary<string, object[]> { { "@message", new object[2] {
-                        SqlDbType.NVarChar, "WikiWalksJp-hurryToSetAllCategories Message: " + ex.Message + " StackTrace: " + ex.StackTrace
-                    } } }
-                );
+                ErrorLog.InsertErrorLog(ex.Message);
                 hurryToSetAllCategories();
             }
         }

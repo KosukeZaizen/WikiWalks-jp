@@ -2,11 +2,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization.Json;
-using System.Text;
-using System.Text.Json;
 
 namespace RelatedPages.Models {
 
@@ -30,19 +26,26 @@ namespace RelatedPages.Models {
 
         public static void SaveCache(Keys key, object data) {
 
-            var con = new DBCon();
+            try
+            {
+                var con = new DBCon();
 
-            var json = System.Text.Json.JsonSerializer.Serialize(data);
+                var json = System.Text.Json.JsonSerializer.Serialize(data);
 
-            con.ExecuteUpdate(@"
+                con.ExecuteUpdate(@"
 update AllDataCache
 set cacheData = @json
 where cacheKey = @key
 ;",
-                new Dictionary<string, object[]> {
+                    new Dictionary<string, object[]> {
                             { "@json", new object[2] { SqlDbType.NVarChar, json } },
                             { "@key", new object[2] { SqlDbType.NVarChar, GetKeyString(key) } }
-                });
+                    });
+            }
+            catch (Exception ex)
+            {
+                ErrorLog.InsertErrorLog(ex.Message);
+            }
         }
 
 
@@ -64,7 +67,9 @@ where cacheKey = N'WikiJpCategory'
                             (string)result["cacheData"]
                         );
                 }
-            } catch (Exception ex) { }
+            } catch (Exception ex) {
+                ErrorLog.InsertErrorLog(ex.Message);
+            }
             return null;
         }
 
@@ -88,7 +93,7 @@ where cacheKey = N'WikiJpPages'
                                 );
                 }
             } catch (Exception ex) {
-                var e = ex;
+                ErrorLog.InsertErrorLog(ex.Message);
             }
             return null;
         }
