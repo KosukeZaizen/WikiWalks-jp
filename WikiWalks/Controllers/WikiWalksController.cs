@@ -9,42 +9,35 @@ using System.Threading.Tasks;
 using System.Text.Json;
 
 
-namespace RelatedPages.Controllers
-{
+namespace RelatedPages.Controllers {
     [Route("api/[controller]")]
-    public class WikiWalksController : Controller
-    {
+    public class WikiWalksController : Controller {
         private readonly AllWordsGetter allWorsGetter;
         private readonly AllCategoriesGetter allCategoriesGetter;
 
-        public WikiWalksController(AllWordsGetter allWorsGetter, AllCategoriesGetter allCategoriesGetter)
-        {
+        public WikiWalksController(AllWordsGetter allWorsGetter, AllCategoriesGetter allCategoriesGetter) {
             this.allWorsGetter = allWorsGetter;
             this.allCategoriesGetter = allCategoriesGetter;
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<Page> getPartialWords(int num)
-        {
+        public IEnumerable<Page> getPartialWords(int num) {
             return allWorsGetter.getPages().Take(num);
         }
 
         [HttpGet("[action]")]
-        public object GetWordIdAndSnippet(string word)
-        {
+        public object GetWordIdAndSnippet(string word) {
             //Z-Apps専用API
             var w = allWorsGetter.getPages().FirstOrDefault(p => p.word == word && CheckValidZAppsWord(word));
 
-            return new
-            {
+            return new {
                 w?.wordId,
                 w?.snippet
             };
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<string> GetAllWords()
-        {
+        public IEnumerable<string> GetAllWords() {
             //Z-Apps専用API
             return allWorsGetter.getPages()
                 .Select(p => p.word)
@@ -52,8 +45,7 @@ namespace RelatedPages.Controllers
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<string> GetPartialKanjiWords(int num)
-        {
+        public IEnumerable<string> GetPartialKanjiWords(int num) {
             //Z-Apps専用API
             return allWorsGetter.getPages()
                 .Take(num * 2)
@@ -63,8 +55,7 @@ namespace RelatedPages.Controllers
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<string> GetRandomKanjiWords(int num)
-        {
+        public IEnumerable<string> GetRandomKanjiWords(int num) {
             //Z-Apps専用API
             return Shuffle(allWorsGetter.getPages())
                 .Take(num * 5)
@@ -73,14 +64,12 @@ namespace RelatedPages.Controllers
                 .Take(num);
         }
 
-        private IEnumerable<T> Shuffle<T>(IEnumerable<T> list)
-        {
+        private IEnumerable<T> Shuffle<T>(IEnumerable<T> list) {
             var tempList = new List<T>(list); // 入力をリストにコピーする
 
             var r = new Random(); // 値を取り出すときに乱数を使用する
 
-            while (tempList.Count() != 0)
-            {
+            while (tempList.Count() != 0) {
                 int index = r.Next(0, tempList.Count);
 
                 T value = tempList[index];
@@ -90,8 +79,7 @@ namespace RelatedPages.Controllers
             }
         }
 
-        public bool CheckValidZAppsWord(string targetWord)
-        {
+        public bool CheckValidZAppsWord(string targetWord) {
             //Z-Apps専用API
             return (System.Text.RegularExpressions.Regex.IsMatch(targetWord,
                 @"[\p{IsCJKUnifiedIdeographs}" +
@@ -108,14 +96,12 @@ namespace RelatedPages.Controllers
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<object> getPartialCategories(int num)
-        {
+        public IEnumerable<object> getPartialCategories(int num) {
             return allCategoriesGetter.getCategories().Take(num);
         }
 
         [HttpGet("[action]")]
-        public IEnumerable<Page> getWordsForCategory(string category)
-        {
+        public IEnumerable<Page> getWordsForCategory(string category) {
             var con = new DBCon();
             var pages = new List<Page>();
 
@@ -124,11 +110,9 @@ namespace RelatedPages.Controllers
             var result = con.ExecuteSelect(sql, new Dictionary<string, object[]> { { "@category", new object[2] { SqlDbType.NVarChar, category } } })
                             .Take(100);
 
-            foreach (var e in result)
-            {
+            foreach (var e in result) {
                 var page = allWorsGetter.getPages().FirstOrDefault(w => w.wordId == (int)e["wordId"]);
-                if (page != null)
-                {
+                if (page != null) {
                     pages.Add(page);
                 }
             }
@@ -136,43 +120,35 @@ namespace RelatedPages.Controllers
             return pages;
         }
 
-        public class GetWordsForCategoryWithoutSnippetResult
-        {
+        public class GetWordsForCategoryWithoutSnippetResult {
             public IEnumerable<Page> pages;
             public bool hasMore;
         }
         [HttpGet("[action]")]
-        public GetWordsForCategoryWithoutSnippetResult getWordsForCategoryWithoutSnippet(string category, int top = 0)
-        {
+        public GetWordsForCategoryWithoutSnippetResult getWordsForCategoryWithoutSnippet(string category, int top = 0) {
             var con = new DBCon();
             var pages = new List<Page>();
             var hasMore = false;
 
             string sql;
             List<Dictionary<string, object>> result;
-            if (top != 0)
-            {
+            if (top != 0) {
                 sql = "select top(@top) wordId from CategoryJp where category like @category;";
                 result = con.ExecuteSelect(sql, new Dictionary<string, object[]> {
                     { "@category", new object[2] { SqlDbType.NVarChar, category } },
                     { "@top", new object[2] { SqlDbType.Int, top } }
                 });
                 hasMore = result.Count() == top;
-            }
-            else
-            {
+            } else {
                 sql = "select wordId from CategoryJp where category like @category;";
                 result = con.ExecuteSelect(sql, new Dictionary<string, object[]> { { "@category", new object[2] { SqlDbType.NVarChar, category } } });
             }
 
-            result.ForEach(e =>
-            {
+            result.ForEach(e => {
                 var page = allWorsGetter.getPages().FirstOrDefault(w => w.wordId == (int)e["wordId"]);
-                if (page != null)
-                {
+                if (page != null) {
                     //カテゴリページにはSnippetが必要ないため、通信量削減のため除去
-                    pages.Add(new Page()
-                    {
+                    pages.Add(new Page() {
                         wordId = page.wordId,
                         word = page.word,
                         referenceCount = page.referenceCount
@@ -184,9 +160,9 @@ namespace RelatedPages.Controllers
         }
 
         [HttpGet("[action]")]
-        public object getWord(int wordId)
-        {
-            if (wordId <= 0) return "";
+        public object getWord(int wordId) {
+            if (wordId <= 0)
+                return "";
 
             var con = new DBCon();
             var result = con.ExecuteSelect("select top(1) word from WordJp where wordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
@@ -195,14 +171,13 @@ namespace RelatedPages.Controllers
 
 
         [HttpGet("[action]")]
-        public string getRelatedArticles(int wordId)
-        {
-            if (wordId <= 0) return "{}";
+        public string getRelatedArticles(int wordId) {
+            if (wordId <= 0)
+                return "{}";
 
             var con = new DBCon();
 
-            Func<string> getRelatedArticlesWithoutCache = () =>
-            {
+            Func<string> getRelatedArticlesWithoutCache = () => {
                 var ps = new List<Page>();
 
                 var result = con.ExecuteSelect(@"
@@ -213,13 +188,10 @@ as wr
 on w.wordId = wr.sourceWordId;
 ", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
 
-                result.ForEach((e) =>
-                {
+                result.ForEach((e) => {
                     var page = allWorsGetter.getPages().FirstOrDefault(w => w.wordId == (int)e["wordId"]);
-                    if (page == null)
-                    {
-                        page = new Page()
-                        {
+                    if (page == null) {
+                        page = new Page() {
                             wordId = (int)e["wordId"],
                             word = (string)e["word"],
                             referenceCount = 0
@@ -229,13 +201,10 @@ on w.wordId = wr.sourceWordId;
                     ps.Add(page);
                 });
 
-                if (ps.Any(p => p.referenceCount > 0))
-                {
+                if (ps.Any(p => p.referenceCount > 0)) {
                     var pages = ps.OrderByDescending(p => p.referenceCount).ToList();
                     return JsonSerializer.Serialize(new { pages });
-                }
-                else
-                {
+                } else {
                     //デプロイ直後でまだallWorsGetterの準備ができていない場合は、
                     //キャッシュテーブルに登録しない
                     return "{}";
@@ -250,19 +219,16 @@ from RelatedArticlesCacheJp
 where wordId = @wordId
 ", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } }).FirstOrDefault();
 
-            if (cache != null)
-            {
+            if (cache != null) {
                 //キャッシュデータあり
                 var cachedResponse = (string)cache["response"];
 
-                Task.Run(async () =>
-                {
+                Task.Run(async () => {
                     //10秒待って再取得・更新
                     await Task.Delay(10 * 1000);
                     string json = getRelatedArticlesWithoutCache();
 
-                    if (json.Contains("pages") && !json.Equals(cachedResponse))
-                    {
+                    if (json.Contains("pages") && !json.Equals(cachedResponse)) {
                         //既にキャッシュされているものとの差分がある場合、キャッシュ内容をupdate
                         await Task.Delay(2 * 1000);
                         con.ExecuteUpdate(@"
@@ -278,18 +244,14 @@ where wordId = @wordId
 
                 //上記完了を待たずに、キャッシュされていたデータを返す
                 return cachedResponse;
-            }
-            else
-            {
+            } else {
                 //キャッシュデータなし
                 string json = getRelatedArticlesWithoutCache();
 
-                Task.Run(async () =>
-                {
+                Task.Run(async () => {
                     //2秒待って登録
                     await Task.Delay(2 * 1000);
-                    if (json.Contains("pages"))
-                    {
+                    if (json.Contains("pages")) {
                         con.ExecuteUpdate("insert into RelatedArticlesCacheJp values(@wordId, @json);", new Dictionary<string, object[]> {
                             { "@json", new object[2] { SqlDbType.NVarChar, json } },
                             { "@wordId", new object[2] { SqlDbType.Int, wordId } }
@@ -302,9 +264,9 @@ where wordId = @wordId
 
 
         [HttpGet("[action]")]
-        public Page getOwnArticle(int wordId)
-        {
-            if (wordId <= 0) return null;
+        public Page getOwnArticle(int wordId) {
+            if (wordId <= 0)
+                return null;
 
             var con = new DBCon();
 
@@ -317,17 +279,14 @@ as wr
 on w.wordId = wr.sourceWordId;
 ", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } }).FirstOrDefault();
 
-            if (result == null)
-            {
+            if (result == null) {
                 //自分自身の説明のデータなし
                 return null;
             }
 
             var page = allWorsGetter.getPages().FirstOrDefault(w => w.wordId == (int)result["wordId"]);
-            if (page == null)
-            {
-                page = new Page()
-                {
+            if (page == null) {
+                page = new Page() {
                     wordId = (int)result["wordId"],
                     word = (string)result["word"],
                     referenceCount = 0
@@ -340,9 +299,9 @@ on w.wordId = wr.sourceWordId;
 
 
         [HttpGet("[action]")]
-        public IEnumerable<Page> get50ArticlesExceptOwn(int wordId)
-        {
-            if (wordId <= 0) return null;
+        public IEnumerable<Page> get50ArticlesExceptOwn(int wordId) {
+            if (wordId <= 0)
+                return null;
 
             var ps = new List<Page>();
             var con = new DBCon();
@@ -355,14 +314,11 @@ as wr
 on w.wordId = wr.sourceWordId;
 ", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
 
-            result.ForEach((e) =>
-            {
+            result.ForEach((e) => {
                 int wId = (int)e["wordId"];
-                if (wId != wordId)
-                {
+                if (wId != wordId) {
                     var page = allWorsGetter.getPages().FirstOrDefault(w => w.wordId == wId);
-                    if (page == null)
-                    {
+                    if (page == null) {
                         page = new Page();
                         page.wordId = (int)e["wordId"];
                         page.word = (string)e["word"];
@@ -376,21 +332,19 @@ on w.wordId = wr.sourceWordId;
             return ps;
         }
 
-        
+
         [HttpGet("[action]")]
-        public object getRelatedCategories(int wordId)
-        {
-            if (wordId <= 0) return new { };
+        public object getRelatedCategories(int wordId) {
+            if (wordId <= 0)
+                return new { };
 
             var con = new DBCon();
             var categories = new List<Category>();
 
             var result = con.ExecuteSelect("select category from CategoryJp where wordId = @wordId;", new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, wordId } } });
-            result.ForEach((f) =>
-            {
+            result.ForEach((f) => {
                 var c = allCategoriesGetter.getCategories().FirstOrDefault(ca => ca.category == (string)f["category"]);
-                if (c != null)
-                {
+                if (c != null) {
                     categories.Add(c);
                 }
             });
