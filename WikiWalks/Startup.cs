@@ -205,6 +205,7 @@ from (
 
                 //DBにエラー内容書き出し
                 ErrorLog.InsertErrorLog(ex.Message);
+
                 hurryToSetAllPages();
             }
         }
@@ -311,63 +312,49 @@ from (
             try {
                 this.allWordsGetter = allWordsGetter;
 
-                Task.Run(() =>
-                {
+                Task.Run(() => {
                     allWordsGetter.hurryToSetAllPages();
                     System.Threading.Thread.Sleep(1000 * 5);//DBへの負荷を考慮して5秒Sleep
                     hurryToSetAllCategories();
                 });
 
-                #if DEBUG
-                    //デバッグ時は以下の処理を起動しない
-                    return;
-                #endif
+#if DEBUG
+                //デバッグ時は以下の処理を起動しない
+                return;
+#endif
 
 
-                Task.Run(async () =>
-                {
+                Task.Run(async () => {
                     await Task.Delay(1000 * 60 * 30);
 
-                    while (true)
-                    {
+                    while (true) {
                         await Task.Delay(1000 * 60);
 
-                        if (DateTime.Now.Minute == 0)
-                        {
-                            try
-                            {
+                        if (DateTime.Now.Minute == 0) {
+                            try {
                                 await allWordsGetter.setAllPagesAsync();
-                            }
-                            catch (Exception ex)
-                            {
+                            } catch (Exception ex) {
                                 ErrorLog.InsertErrorLog("allWordsGetter.setAllPagesAsync(); " + ex.Message);
                             }
 
                             await Task.Delay(1000 * 60 * 5);
 
-                            try
-                            {
+                            try {
                                 await setAllCategoriesAsync();
-                            }
-                            catch (Exception ex)
-                            {
+                            } catch (Exception ex) {
                                 ErrorLog.InsertErrorLog("setAllCategoriesAsync(); " + ex.Message);
                             }
 
-                            try
-                            {
+                            try {
                                 //バッチが動いてなければ起動
                                 StartBatch();
-                            }
-                            catch (Exception ex)
-                            {
+                            } catch (Exception ex) {
                                 ErrorLog.InsertErrorLog("バッチが動いてなければ起動 " + ex.Message);
                             }
                         }
                     }
                 });
-            }
-            catch (Exception ex) {
+            } catch (Exception ex) {
                 ErrorLog.InsertErrorLog(ex.Message);
             }
         }
@@ -425,17 +412,9 @@ group by category
 
                 //DBにエラー内容書き出し
                 ErrorLog.InsertErrorLog(ex.Message);
+
                 hurryToSetAllCategories();
             }
-        }
-
-        private void setCategoriesForDebug() {
-            Task.Run(() => {
-                var cachedCategory = AllDataCache.GetCacheCategory();
-                if (cachedCategory != null) {
-                    categories = cachedCategory;
-                }
-            });
         }
 
 
