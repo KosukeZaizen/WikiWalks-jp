@@ -412,32 +412,6 @@ from (
                     DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpCategory, false); //終了記録
                     return;
                 }
-
-                var con = new DBCon();
-                var l = new List<Category>();
-
-                var result = con.ExecuteSelect(@"
-select category, count(*) as cnt 
-from CategoryJp C
-inner join (select targetWordId from WordReferenceJp group by targetWordId having count(targetWordId) > 4) as W
-on W.targetWordId = C.wordId 
-group by category
-;", null, 60 * 60 * 6);// タイムアウト６時間
-
-                result.ForEach((e) =>
-                {
-                    var c = new Category();
-                    c.category = (string)e["category"];
-                    c.cnt = (int)e["cnt"];
-
-                    l.Add(c);
-                });
-
-                categories = l.OrderByDescending(c => c.cnt).ToList();
-
-                AllDataCache.SaveCache(AllDataCache.Keys.WikiJpCategory, categories);
-
-                DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpCategory, false); //終了記録
             }
             catch (Exception ex)
             {
@@ -476,7 +450,7 @@ group by category
             await Task.Delay(1000 * 45);
             foreach (var cat in hashCategories)
             {
-                await Task.Delay(10);
+                await Task.Delay(30);
 
                 var c = new Category();
                 c.category = cat;
