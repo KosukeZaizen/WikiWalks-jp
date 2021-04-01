@@ -185,12 +185,9 @@ namespace WikiWalks
                 var cachedPage = AllDataCache.GetCachePage();
                 if (cachedPage != null)
                 {
-
                     pages = cachedPage;
-
-                    DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpPage, false); //終了記録
-                    return;
                 }
+                DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpPage, false); //終了記録
             }
             catch (Exception ex)
             {
@@ -406,12 +403,9 @@ from (
                 var cachedCategory = AllDataCache.GetCacheCategory();
                 if (cachedCategory != null)
                 {
-
                     categories = cachedCategory;
-
-                    DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpCategory, false); //終了記録
-                    return;
                 }
+                DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpCategory, false); //終了記録
             }
             catch (Exception ex)
             {
@@ -437,7 +431,7 @@ from (
             var hashCategories = new HashSet<string>();
             foreach (var page in pages)
             {
-                await Task.Delay(10);
+                await Task.Delay(30);
                 con.ExecuteSelect(
                         "select category from CategoryJp where wordId = @wordId;",
                         new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, page.wordId } } }
