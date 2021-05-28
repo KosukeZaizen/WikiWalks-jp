@@ -384,7 +384,7 @@ from (
         {
             using (var client = new HttpClient())
             {
-                HttpResponseMessage response = await client.GetAsync(@"https://wiki-bat-jp.azurewebsites.net/");
+                HttpResponseMessage response = await client.GetAsync(@"https://wiki-bat.azurewebsites.net/");
                 string msg = await response.Content.ReadAsStringAsync();
             }
         }
