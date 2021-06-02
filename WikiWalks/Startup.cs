@@ -180,14 +180,11 @@ namespace WikiWalks
         {
             try
             {
-                DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpPage, true); //開始記録
-
                 var cachedPage = AllDataCache.GetCachePage();
                 if (cachedPage != null)
                 {
                     pages = cachedPage;
                 }
-                DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpPage, false); //終了記録
             }
             catch (Exception ex)
             {
@@ -226,18 +223,18 @@ from (
 ) as wr1
 ;";
 
-            await Task.Delay(1000 * 20);
+            await Task.Delay(1000 * 30);
             for (var wordId = min; wordId <= max; wordId++)
             {
                 var d = wordId - min;
                 if (d < 1000)
                 {
                     //前半に大きな負荷がかかっているように見受けられるため、前半の待機を長めに
-                    await Task.Delay(2100 - (d * 2));
+                    await Task.Delay(2500 - (d * 2));
                 }
                 else
                 {
-                    await Task.Delay(100);
+                    await Task.Delay(500);
                 }
 
                 var count = (int)con.ExecuteSelect(
@@ -247,7 +244,7 @@ from (
 
                 if (count > 4)
                 {
-                    await Task.Delay(200);
+                    await Task.Delay(500);
                     Page page = new Page
                     {
                         wordId = wordId,
@@ -266,7 +263,7 @@ from (
                     }
 
                     allPages.Add(page);
-                    await Task.Delay(200);
+                    await Task.Delay(500);
                 }
             }
 
@@ -398,14 +395,11 @@ from (
         {
             try
             {
-                DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpCategory, true); //開始記録
-
                 var cachedCategory = AllDataCache.GetCacheCategory();
                 if (cachedCategory != null)
                 {
                     categories = cachedCategory;
                 }
-                DB_Util.RegisterLastTopUpdate(DB_Util.procTypes.jpCategory, false); //終了記録
             }
             catch (Exception ex)
             {
@@ -431,7 +425,7 @@ from (
             var hashCategories = new HashSet<string>();
             foreach (var page in pages)
             {
-                await Task.Delay(30);
+                await Task.Delay(500);
                 con.ExecuteSelect(
                         "select category from CategoryJp where wordId = @wordId;",
                         new Dictionary<string, object[]> { { "@wordId", new object[2] { SqlDbType.Int, page.wordId } } }
@@ -444,7 +438,7 @@ from (
             await Task.Delay(1000 * 45);
             foreach (var cat in hashCategories)
             {
-                await Task.Delay(30);
+                await Task.Delay(500);
 
                 var c = new Category();
                 c.category = cat;
