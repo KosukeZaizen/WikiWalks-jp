@@ -86,11 +86,7 @@ class PagesForTheTitles extends Component {
             if (page) {
                 if (page.snippet) {
                     description =
-                        convertSnippet(page.snippet)
-                            .split("<bold>")
-                            .join("")
-                            .split("</bold>")
-                            .join("") + "...";
+                        removeBold(convertSnippet(page.snippet)) + "...";
                 }
             }
         }
@@ -292,18 +288,8 @@ function renderTable(pages, wordId, word) {
         pages
             .sort(
                 (page1, page2) =>
-                    page2.snippet
-                        .split("<bold>")
-                        .join("")
-                        .split("</bold>")
-                        .join("")
-                        .split(word).length -
-                    page1.snippet
-                        .split("<bold>")
-                        .join("")
-                        .split("</bold>")
-                        .join("")
-                        .split(word).length
+                    removeBold(page2.snippet).split(word).length -
+                    removeBold(page1.snippet).split(word).length
             )
             .sort((page1, page2) => {
                 if (page2.wordId === wordId) {
@@ -527,11 +513,9 @@ class RenderOtherTable extends Component {
                                             )}
                                         </td>
                                         <td>
-                                            {convertSnippet(page.snippet)
-                                                .split("<bold>")
-                                                .join("")
-                                                .split("</bold>")
-                                                .join("")}
+                                            {removeBold(
+                                                convertSnippet(page.snippet)
+                                            )}
                                             <br />
                                             <Button
                                                 size="sm"
@@ -683,6 +667,10 @@ function convertSnippet(str) {
         .join("'")
         .split("&#x60;")
         .join("`");
+}
+
+function removeBold(str) {
+    return str.split("<bold>").join("").split("</bold>").join("");
 }
 
 export default connect(
