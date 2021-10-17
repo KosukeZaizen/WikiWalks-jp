@@ -85,8 +85,10 @@ class PagesForTheTitles extends Component {
             const page = pages.find(p => p.wordId === wordId);
             if (page) {
                 if (page.snippet) {
-                    description =
-                        removeBold(convertSnippet(page.snippet)) + "...";
+                    const snippet = `${removeBold(
+                        convertSnippet(page.snippet)
+                    )}...`;
+                    description = `「${word}」に関するWikipedia記事の一覧です: "${snippet}"`;
                 }
             }
         }
