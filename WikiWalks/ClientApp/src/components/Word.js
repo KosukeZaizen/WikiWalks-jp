@@ -389,9 +389,7 @@ function renderTable(pages, wordId, word) {
             }
             {pageLoaded && (
                 <React.Fragment>
-                    {pages.length > 50 && (
-                        <GoogleAd style={{ padding: "10px 0" }} />
-                    )}
+                    {pages.length > 50 && <AdBetweenTables />}
                     {data.length > 0 && (
                         <table
                             className="table table-striped"
@@ -403,9 +401,7 @@ function renderTable(pages, wordId, word) {
                             </tbody>
                         </table>
                     )}
-                    {pages.length > 50 && (
-                        <GoogleAd style={{ padding: "10px 0" }} />
-                    )}
+                    {pages.length > 50 && <AdBetweenTables />}
                     {data.length > 0 && (
                         <table
                             className="table table-striped"
@@ -414,9 +410,7 @@ function renderTable(pages, wordId, word) {
                             <tbody>{data.splice(0, 12)}</tbody>
                         </table>
                     )}
-                    {pages.length > 50 && (
-                        <GoogleAd style={{ padding: "10px 0" }} />
-                    )}
+                    {pages.length > 50 && <AdBetweenTables />}
                     {data.length > 0 && (
                         <table
                             className="table table-striped"
@@ -425,9 +419,7 @@ function renderTable(pages, wordId, word) {
                             <tbody>{data.splice(0, 12)}</tbody>
                         </table>
                     )}
-                    {pages.length > 50 && (
-                        <GoogleAd style={{ padding: "10px 0" }} />
-                    )}
+                    {pages.length > 50 && <AdBetweenTables />}
                     {data.length > 0 && (
                         <table
                             className="table table-striped"
@@ -436,9 +428,7 @@ function renderTable(pages, wordId, word) {
                             <tbody>{data.splice(0, 12)}</tbody>
                         </table>
                     )}
-                    {pages.length > 50 && (
-                        <GoogleAd style={{ padding: "10px 0" }} />
-                    )}
+                    {pages.length > 50 && <AdBetweenTables />}
                     {data.length > 0 && (
                         <table
                             className="table table-striped"
@@ -450,6 +440,17 @@ function renderTable(pages, wordId, word) {
                 </React.Fragment>
             )}
         </React.Fragment>
+    );
+}
+
+function AdBetweenTables() {
+    return (
+        <div style={{ padding: "15px 0" }}>
+            <p style={{ margin: 0, fontSize: "small", fontWeight: "bold" }}>
+                スポンサーリンク
+            </p>
+            <GoogleAd />
+        </div>
     );
 }
 
