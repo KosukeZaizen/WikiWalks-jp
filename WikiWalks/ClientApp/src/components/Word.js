@@ -77,24 +77,8 @@ class PagesForTheTitles extends Component {
         const category = cat && cat.category;
         const categoryForUrl =
             category && encodeURIComponent(category.split(" ").join("_"));
-
-        let description = `「${word}」に関するWikipedia記事の一覧です。「${word}」の話題に触れているページや、「${word}」と関連が深いページをご紹介します。`;
+        const description = `「${word}」に関するWikipedia記事の一覧です。「${word}」の話題に触れているページや、「${word}」と関連が深いページをご紹介します。`;
         const arrDesc = description.split("。");
-
-        if (pages) {
-            const page = pages.find(p => p.wordId === wordId);
-            if (page) {
-                if (page.snippet) {
-                    description =
-                        convertSnippet(page.snippet)
-                            .split("<bold>")
-                            .join("")
-                            .split("</bold>")
-                            .join("") + "...";
-                }
-            }
-        }
-
         const lineChangeDesc = arrDesc.map((d, i) => (
             <span key={i}>
                 {d}
@@ -324,7 +308,28 @@ function renderTable(pages, wordId, word) {
                         )}
                     </td>
                     <td>
-                        {convertSnippet(page.snippet)
+                        {page.snippet
+                            .replace(new RegExp("<$"), "")
+                            .replace(new RegExp("<b$"), "")
+                            .replace(new RegExp("<bo$"), "")
+                            .replace(new RegExp("<bol$"), "")
+                            .replace(new RegExp("<bold$"), "")
+                            .replace(new RegExp("</b$"), "")
+                            .replace(new RegExp("</bo$"), "")
+                            .replace(new RegExp("</bol$"), "")
+                            .replace(new RegExp("</bold$"), "")
+                            .split("&lt;")
+                            .join("<")
+                            .split("&gt;")
+                            .join(">")
+                            .split("&amp;")
+                            .join("&")
+                            .split("&quot;")
+                            .join('"')
+                            .split("&#x27;")
+                            .join("'")
+                            .split("&#x60;")
+                            .join("`")
                             .split("<bold>")
                             .map(bo => bo.split("</bold>"))
                             .flat()
@@ -528,7 +533,43 @@ class RenderOtherTable extends Component {
                                             )}
                                         </td>
                                         <td>
-                                            {convertSnippet(page.snippet)
+                                            {page.snippet
+                                                .replace(new RegExp("<$"), "")
+                                                .replace(new RegExp("<b$"), "")
+                                                .replace(new RegExp("<bo$"), "")
+                                                .replace(
+                                                    new RegExp("<bol$"),
+                                                    ""
+                                                )
+                                                .replace(
+                                                    new RegExp("<bold$"),
+                                                    ""
+                                                )
+                                                .replace(new RegExp("</b$"), "")
+                                                .replace(
+                                                    new RegExp("</bo$"),
+                                                    ""
+                                                )
+                                                .replace(
+                                                    new RegExp("</bol$"),
+                                                    ""
+                                                )
+                                                .replace(
+                                                    new RegExp("</bold$"),
+                                                    ""
+                                                )
+                                                .split("&lt;")
+                                                .join("<")
+                                                .split("&gt;")
+                                                .join(">")
+                                                .split("&amp;")
+                                                .join("&")
+                                                .split("&quot;")
+                                                .join('"')
+                                                .split("&#x27;")
+                                                .join("'")
+                                                .split("&#x60;")
+                                                .join("`")
                                                 .split("<bold>")
                                                 .join("")
                                                 .split("</bold>")
@@ -659,31 +700,6 @@ class ReturnToIndex extends React.Component {
             </div>
         );
     }
-}
-
-function convertSnippet(str) {
-    return str
-        .replace(new RegExp("<$"), "")
-        .replace(new RegExp("<b$"), "")
-        .replace(new RegExp("<bo$"), "")
-        .replace(new RegExp("<bol$"), "")
-        .replace(new RegExp("<bold$"), "")
-        .replace(new RegExp("</b$"), "")
-        .replace(new RegExp("</bo$"), "")
-        .replace(new RegExp("</bol$"), "")
-        .replace(new RegExp("</bold$"), "")
-        .split("&lt;")
-        .join("<")
-        .split("&gt;")
-        .join(">")
-        .split("&amp;")
-        .join("&")
-        .split("&quot;")
-        .join('"')
-        .split("&#x27;")
-        .join("'")
-        .split("&#x60;")
-        .join("`");
 }
 
 export default connect(
